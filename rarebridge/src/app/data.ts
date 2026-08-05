@@ -76,13 +76,13 @@ export const CATEGORY_FILTERS = ["All", "Genetic", "Neurological", "Metabolic", 
 export const STATUS_FILTERS = ["All Status", "Active Research", "Approved Treatment", "Support Available"];
 
 export const COLOR_MAP: Record<string, { bg: string; text: string; badge: string; ring: string; iconBg: string }> = {
-  navy:    { bg: "bg-[#E7E2CE]",    text: "text-[#112250]", badge: "bg-[#112250] text-[#F5F4F0]", ring: "ring-[#BEB7A7]", iconBg: "bg-[#112250]" },
-  sapphire:{ bg: "bg-[#F5F4F0]",    text: "text-[#3B507D]", badge: "bg-[#3B507D] text-[#F5F4F0]", ring: "ring-[#BEB7A7]", iconBg: "bg-[#3B507D]" },
-  taupe:   { bg: "bg-[#BEB7A7]/20", text: "text-[#112250]", badge: "bg-[#BEB7A7] text-[#112250]", ring: "ring-[#BEB7A7]", iconBg: "bg-[#BEB7A7]" },
+  navy:    { bg: "bg-secondary",    text: "text-primary", badge: "bg-primary text-ivory", ring: "ring-taupe", iconBg: "bg-primary" },
+  sapphire:{ bg: "bg-ivory",    text: "text-accent", badge: "bg-accent text-ivory", ring: "ring-taupe", iconBg: "bg-accent" },
+  taupe:   { bg: "bg-taupe-20", text: "text-primary", badge: "bg-taupe text-primary", ring: "ring-taupe", iconBg: "bg-taupe" },
 };
 
 export const STATUS_COLOR: Record<string, string> = {
-  "Active Research":    "bg-[#3B507D]/10 text-[#3B507D]",
+  "Active Research":    "bg-accent-10 text-accent",
   "Approved Treatment": "bg-emerald-100 text-emerald-700",
   "Support Available":  "bg-amber-100 text-amber-700",
 };

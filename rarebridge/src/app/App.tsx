@@ -42,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F5F4F0]" style={{ fontFamily: "Inter, sans-serif" }}>
+    <div className="relative min-h-screen overflow-hidden bg-ivory" style={{ fontFamily: "Inter, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
         .scrollbar-none::-webkit-scrollbar { display: none; }
