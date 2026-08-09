@@ -10,16 +10,21 @@ export default function MobileNav({ onNav, activeView }: { onNav: (v: string) =>
     { label: "Community", icon: Users, view: "community" },
   ];
   return (
-    <div className="fixed bottom-0 left-0 right-0 md:hidden bg-ivory border-t border-taupe-40 z-50">
+    <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white/95 backdrop-blur-md border-t border-taupe-40/60 shadow-lg z-50">
       <div className="flex">
         {tabs.map(t => (
           <button
             key={t.label}
             onClick={() => onNav(t.view)}
-            className={`flex-1 flex flex-col items-center py-2 transition-colors ${activeView === t.view ? "text-primary" : "text-taupe hover:text-primary"}`}
+            className={`flex-1 flex flex-col items-center py-2.5 transition-all duration-200 ${activeView === t.view
+                ? "text-primary"
+                : "text-taupe hover:text-primary"
+              }`}
           >
-            <t.icon className="w-5 h-5" />
-            <span className="text-[10px] mt-0.5 font-medium">{t.label}</span>
+            <div className={`p-1.5 rounded-xl transition-all duration-200 ${activeView === t.view ? "bg-secondary" : ""}`}>
+              <t.icon className="w-5 h-5" />
+            </div>
+            <span className={`text-[10px] mt-0.5 font-semibold ${activeView === t.view ? "text-primary" : "text-taupe"}`}>{t.label}</span>
           </button>
         ))}
       </div>

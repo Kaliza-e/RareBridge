@@ -1,6 +1,6 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Bot, Footprints, Star,
+  Bot, Star,
   AlertCircle, Stethoscope, ClipboardList, Syringe, Users as UsersIcon, Microscope as MicroscopeIcon
 } from "lucide-react";
 import { Disease } from "../../data";
@@ -136,20 +136,112 @@ export function BackgroundParticles() {
   );
 }
 
-export function HoofSound() {
-  const playHoofSound = useHoofSound();
+export function AIAssistant() {
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<{ role: "user" | "ai"; text: string }[]>([
+    { role: "ai", text: "Hi! I'm your RareBridge AI guide. Ask me anything about rare diseases, symptoms, research, or how to use the platform." }
+  ]);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const QUICK = ["What is Krabbe disease?", "How do I find a specialist?", "What are common rare disease symptoms?"];
+
+  function send(text: string) {
+    if (!text.trim()) return;
+    const userMsg = text.trim();
+    setMessages(m => [...m, { role: "user", text: userMsg }]);
+    setInput("");
+    setTimeout(() => {
+      const lower = userMsg.toLowerCase();
+      let reply = "I can help with that! For detailed information on this topic, try searching the disease directory or browsing our specialist listings.";
+      if (lower.includes("krabbe")) reply = "Krabbe disease is a rare inherited disorder that destroys the myelin sheath protecting nerve cells. It's caused by mutations in the GALC gene and most often appears in early infancy.";
+      else if (lower.includes("specialist")) reply = "You can find specialists by clicking 'Specialists' in the navigation. You can filter by disease type, location, and expertise.";
+      else if (lower.includes("symptom")) reply = "Common signs that may indicate a rare disease include developmental delays, unexplained muscle weakness, vision or hearing changes, and unusual lab results. Always consult a physician for evaluation.";
+      else if (lower.includes("research")) reply = "Head to the Research section for the latest gene therapy breakthroughs, clinical trials, and pharmaceutical pipeline news for rare diseases.";
+      setMessages(m => [...m, { role: "ai", text: reply }]);
+    }, 800);
+  }
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
-    <button
-      onClick={(event) => {
-        event.stopPropagation();
-        playHoofSound();
-      }}
-      className="hoof-sound-control fixed right-4 bottom-24 z-50 flex items-center gap-2 rounded-3xl bg-primary px-4 py-3 text-sm font-semibold text-ivory transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-dark zebra-button-glow md:right-8 md:bottom-8"
-    >
-      <Footprints className="w-4 h-4" />
-      Hoof stomp
-    </button>
+    <>
+      {/* Floating button */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="ai-assistant-control fixed right-5 bottom-24 md:bottom-8 z-50 flex items-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-ivory shadow-xl hover:bg-accent transition-all duration-200 hover:-translate-y-0.5 group"
+        aria-label="Open AI Assistant"
+      >
+        <Bot className="w-5 h-5" />
+        <span className="hidden sm:inline">Ask AI</span>
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
+        </span>
+      </button>
+
+      {/* Popup panel */}
+      {open && (
+        <div className="fixed right-5 bottom-36 md:bottom-24 z-50 w-[340px] sm:w-[380px] rounded-3xl bg-white border border-taupe-40 shadow-2xl flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 bg-primary px-5 py-4">
+            <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+              <Bot className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-black text-ivory text-sm leading-none">RareBridge AI</p>
+              <p className="text-taupe text-xs mt-0.5">Ask anything about rare diseases</p>
+            </div>
+            <button onClick={() => setOpen(false)} className="text-taupe hover:text-ivory transition-colors p-1">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 max-h-64 scrollbar-none">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === "user"
+                  ? "bg-primary text-ivory rounded-br-sm"
+                  : "bg-secondary text-primary rounded-bl-sm"
+                  }`}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Quick questions */}
+          <div className="px-4 pb-2 flex gap-2 overflow-x-auto scrollbar-none">
+            {QUICK.map(q => (
+              <button key={q} onClick={() => send(q)} className="shrink-0 px-3 py-1.5 rounded-full bg-secondary text-primary text-xs font-semibold hover:bg-primary hover:text-ivory transition-colors whitespace-nowrap">
+                {q}
+              </button>
+            ))}
+          </div>
+
+          {/* Input */}
+          <div className="px-4 pb-4 pt-2">
+            <div className="flex items-center gap-2 bg-ivory rounded-xl border border-taupe-40 px-3 py-2 focus-within:border-primary transition-colors">
+              <input
+                type="text"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && send(input)}
+                placeholder="Ask a question…"
+                className="flex-1 bg-transparent text-sm text-primary placeholder-taupe outline-none font-medium"
+              />
+              <button onClick={() => send(input)} className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center hover:bg-accent transition-colors shrink-0">
+                <svg className="w-3.5 h-3.5 text-ivory" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -186,7 +278,7 @@ export function PatientJourney() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-accent text-xs font-bold mb-4">
-            <Footprints className="w-3 h-3" /> Patient Journey
+            <MicroscopeIcon className="w-3 h-3" /> Patient Journey
           </div>
           <h2 className="font-black text-3xl md:text-4xl text-primary mb-4">What Families Typically Experience</h2>
         </div>
@@ -204,21 +296,21 @@ export function PatientJourney() {
                   <div className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-4 ${activeStep === i ? "border-primary bg-primary text-secondary shadow-lg" : "border-secondary bg-white text-primary"}`}>
                     <Icon className="h-6 w-6" />
                   </div>
-                          <div className={`mt-6 rounded-[2rem] border border-secondary bg-white p-6 shadow-sm transition-transform duration-200 ${activeStep === i ? "scale-105 shadow-xl" : "hover:-translate-y-1"}`}>
-                            <h3 className="font-bold text-primary mb-2">{step.label}</h3>
-                            <p className="text-sm text-accent leading-relaxed">{step.desc}</p>
+                  <div className={`mt-6 rounded-[2rem] border border-secondary bg-white p-6 shadow-sm transition-transform duration-200 ${activeStep === i ? "scale-105 shadow-xl" : "hover:-translate-y-1"}`}>
+                    <h3 className="font-bold text-primary mb-2">{step.label}</h3>
+                    <p className="text-sm text-accent leading-relaxed">{step.desc}</p>
                   </div>
-                          <span className={`absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-white border border-secondary ${isTop ? "-translate-y-1/2" : "translate-y-1/2"}`} />
+                  <span className={`absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-white border border-secondary ${isTop ? "-translate-y-1/2" : "translate-y-1/2"}`} />
                 </button>
               );
             })}
           </div>
         </div>
-                <div className="mt-12 rounded-3xl bg-primary p-8 md:p-10 text-white shadow-2xl">
-                  <div className="text-taupe text-xs font-bold uppercase tracking-widest mb-1">Step {activeStep + 1} of {JOURNEY_STEPS.length}</div>
-                  <h3 className="font-black text-3xl mb-3">{JOURNEY_STEPS[activeStep].label}</h3>
-                  <p className="text-secondary text-lg leading-relaxed max-w-3xl">{JOURNEY_STEPS[activeStep].desc}</p>
-                </div>
+        <div className="mt-12 rounded-3xl bg-primary p-8 md:p-10 text-white shadow-2xl">
+          <div className="text-taupe text-xs font-bold uppercase tracking-widest mb-1">Step {activeStep + 1} of {JOURNEY_STEPS.length}</div>
+          <h3 className="font-black text-3xl mb-3">{JOURNEY_STEPS[activeStep].label}</h3>
+          <p className="text-secondary text-lg leading-relaxed max-w-3xl">{JOURNEY_STEPS[activeStep].desc}</p>
+        </div>
       </div>
     </section>
   );
