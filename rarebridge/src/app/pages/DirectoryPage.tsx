@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Search, SlidersHorizontal, X, BookOpen } from "lucide-react";
 import { DISEASES, CATEGORY_FILTERS, STATUS_FILTERS } from "../data";
-import { ZebraEmptyState, DiseaseCard } from "../components/common/Visuals";
+import { ZebraEmptyState, DiseaseCard, ButterflyDoodle, EdelweissFlower } from "../components/common/Visuals";
 
 export default function DirectoryPage({ onDisease }: { onDisease: (id: string) => void }) {
   const [query, setQuery] = useState("");
@@ -31,6 +31,16 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-secondary opacity-10 blur-[100px]" />
           <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-accent opacity-5 blur-[80px]" />
+          {/* Floating doodles */}
+          <div className="absolute top-10 left-10 animate-float" style={{ animationDelay: '0s' }}>
+            <ButterflyDoodle size={35} className="opacity-30" />
+          </div>
+          <div className="absolute top-20 right-20 animate-float" style={{ animationDelay: '1.5s' }}>
+            <EdelweissFlower size={45} className="opacity-25" />
+          </div>
+          <div className="absolute bottom-10 left-1/4 animate-float" style={{ animationDelay: '0.8s' }}>
+            <ButterflyDoodle size={30} className="opacity-20" />
+          </div>
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="flex items-center gap-3 mb-3">

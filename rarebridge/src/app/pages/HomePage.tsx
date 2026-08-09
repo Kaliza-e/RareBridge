@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Search, X, Star, ArrowRight, Users, Sparkles, ChevronRight } from "lucide-react";
-import { HeroIllustration, ZebraEmptyState, PatientJourney, DiseaseCard, ZebraMascot, ZebraDoodle } from "../components/common/Visuals";
-import { DISEASES, SUGGESTED_SEARCHES, STATS, FEATURES, COLOR_MAP, STATUS_COLOR } from "../data";
-import type { Disease } from "../data";
-import { Heart } from "lucide-react";
+import { Search, ArrowRight, BookOpen, Sparkles, Trophy, Target, Zap, Users, ChevronRight, Heart, FlaskConical, Pill, Stethoscope, UserCircle } from "lucide-react";
+import { DISEASES, SUGGESTED_SEARCHES, STATS, FEATURES, COLOR_MAP, STATUS_COLOR, type Disease } from "../data";
+import { ZebraMascot, ZebraWithButterfly, ButterflyDoodle, EdelweissFlower, DiseaseCard, PatientJourney } from "../components/common/Visuals";
 
 // Word-by-word animated headline
 function AnimatedHeadline() {
@@ -87,7 +85,24 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
             Trusted by 120,000+ families worldwide
           </div>
 
+          {/* Main zebra with butterfly illustration */}
+          <div className={`mb-6 relative ${fadeUp("delay-[200ms]")}`}>
+            <ZebraWithButterfly size={140} className="animate-float sound-effect-sparkle cursor-pointer" />
+          </div>
+
           <AnimatedHeadline />
+
+          <div className={`flex items-center justify-center gap-4 mb-6 ${fadeUp("delay-[700ms]")}`}>
+            <div className="animate-bounce" style={{ animationDelay: '0s' }}>
+              <ZebraMascot size={32} />
+            </div>
+            <div className="animate-bounce" style={{ animationDelay: '0.3s' }}>
+              <ButterflyDoodle size={32} />
+            </div>
+            <div className="animate-bounce" style={{ animationDelay: '0.6s' }}>
+              <EdelweissFlower size={32} />
+            </div>
+          </div>
 
           <p className={`text-lg md:text-xl text-accent leading-relaxed mb-10 max-w-2xl ${fadeUp("delay-[750ms]")}`}>
             RareBridge helps families understand rare diseases, discover trusted information, connect with specialists, and find supportive communities.
@@ -130,13 +145,14 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
 
           {/* Suggested searches */}
           <div className={`flex flex-wrap justify-center gap-2 mb-10 ${fadeUp("delay-[1000ms]")}`}>
-            <span className="text-xs text-taupe font-medium self-center">Try:</span>
-            {SUGGESTED_SEARCHES.map(s => (
+            <span className="text-xs text-taupe font-medium self-center flex items-center gap-1"><Search className="w-3 h-3" /> Try:</span>
+            {SUGGESTED_SEARCHES.map((s, i) => (
               <button
                 key={s}
                 onClick={() => handleSearch(s)}
-                className="px-3 py-1.5 rounded-full bg-white border border-taupe-40 text-xs font-semibold text-accent hover:bg-primary hover:border-primary hover:text-ivory transition-all duration-200 shadow-sm"
+                className="sound-effect-pop px-3 py-1.5 rounded-full bg-white border border-taupe-40 text-xs font-semibold text-accent hover:bg-primary hover:border-primary hover:text-ivory transition-all duration-200 shadow-sm flex items-center gap-1"
               >
+                {[<BookOpen key="book" className="w-3 h-3" />, <Target key="target" className="w-3 h-3" />, <Zap key="zap" className="w-3 h-3" />, <Heart key="heart" className="w-3 h-3" />, <Users key="users" className="w-3 h-3" />][i % 5]}
                 {s}
               </button>
             ))}
@@ -146,21 +162,35 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
           <div className={`flex flex-wrap justify-center gap-3 mb-14 ${fadeUp("delay-[1100ms]")}`}>
             <button
               onClick={() => onNav("signin")}
-              className="group px-6 py-3 rounded-2xl border-2 border-primary text-primary font-bold hover:bg-primary hover:text-ivory transition-all duration-200 flex items-center gap-2 shadow-sm"
+              className="sound-effect-chime group px-6 py-3 rounded-2xl border-2 border-primary text-primary font-bold hover:bg-primary hover:text-ivory transition-all duration-200 flex items-center gap-2 shadow-sm"
             >
               <Users className="w-4 h-4" /> Find Support
               <ChevronRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
             </button>
             <button
               onClick={() => onNav("signup")}
-              className="group px-7 py-3 rounded-2xl bg-primary text-ivory font-bold hover:bg-accent transition-all duration-200 flex items-center gap-2 shadow-md"
+              className="sound-effect-chime group px-7 py-3 rounded-2xl bg-primary text-ivory font-bold hover:bg-accent transition-all duration-200 flex items-center gap-2 shadow-md"
             >
               <Sparkles className="w-4 h-4" /> Get Started Free
               <ChevronRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
             </button>
           </div>
 
-          {/* Stats ribbon placeholder — closes section */}
+          {/* Floating doodles decoration */}
+          <div className={`absolute inset-0 pointer-events-none ${fadeUp("delay-[1300ms]")}`}>
+            <div className="absolute top-20 left-10 animate-float" style={{ animationDelay: '0s' }}>
+              <ButterflyDoodle size={40} className="opacity-60" />
+            </div>
+            <div className="absolute top-32 right-16 animate-float" style={{ animationDelay: '1s' }}>
+              <EdelweissFlower size={50} className="opacity-50" />
+            </div>
+            <div className="absolute bottom-40 left-20 animate-float" style={{ animationDelay: '2s' }}>
+              <ButterflyDoodle size={35} className="opacity-40" />
+            </div>
+            <div className="absolute bottom-32 right-10 animate-float" style={{ animationDelay: '0.5s' }}>
+              <EdelweissFlower size={45} className="opacity-50" />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -174,6 +204,7 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
           {[...STATS, ...STATS, ...STATS, ...STATS].map((s, i) => (
             <div key={i} className="flex items-center gap-8 px-10">
               <div className="flex items-center gap-3">
+                {[<ZebraMascot key="zebra" size={24} />, <ButterflyDoodle key="butterfly" size={24} />, <EdelweissFlower key="flower" size={24} />, <Heart key="heart" className="w-6 h-6" />, <Users key="users" className="w-6 h-6" />, <Trophy key="trophy" className="w-6 h-6" />, <Sparkles key="sparkles" className="w-6 h-6" />, <Target key="target" className="w-6 h-6" />][i % 8]}
                 <span className="font-black text-2xl text-secondary tracking-tight">{s.value}</span>
                 <span className="text-xs font-bold text-taupe uppercase tracking-widest whitespace-nowrap">{s.label}</span>
               </div>
@@ -185,22 +216,22 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
 
       <PatientJourney />
 
-      <section className="bg-primary py-24">
+      <section className="bg-gradient-to-b from-white to-secondary/10 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-secondary text-xs font-bold uppercase tracking-widest mb-4">Platform</span>
-            <h2 className="font-black text-3xl md:text-4xl text-ivory mb-4">Everything You Need, In One Place</h2>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-primary text-xs font-bold uppercase tracking-widest mb-4">Platform</span>
+            <h2 className="font-black text-3xl md:text-4xl text-primary mb-4" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>Everything You Need, In One Place</h2>
             <p className="text-taupe max-w-xl mx-auto text-base leading-relaxed">From diagnosis support to research breakthroughs — RareBridge is your trusted companion at every step.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map(f => (
-              <div key={f.title} className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:-translate-y-2 hover:bg-white/10 hover:border-secondary/40 hover:shadow-2xl group cursor-default">
+            {FEATURES.map((f, i) => (
+              <div key={f.title} className="relative overflow-hidden rounded-3xl border-2 border-taupe-30 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-accent/60 hover:scale-105 group cursor-default">
                 <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-secondary/10 blur-2xl group-hover:bg-secondary/20 transition-all duration-500" />
                 <div className="relative z-10">
                   <div className="w-11 h-11 rounded-2xl bg-secondary/20 flex items-center justify-center mb-4 group-hover:bg-secondary/30 transition-colors">
-                    <f.icon className="w-5 h-5 text-secondary" />
+                    {[<BookOpen key="book" className="w-5 h-5 text-secondary" />, <Search key="search" className="w-5 h-5 text-secondary" />, <Users key="users" className="w-5 h-5 text-secondary" />, <Target key="target" className="w-5 h-5 text-secondary" />, <Trophy key="trophy" className="w-5 h-5 text-secondary" />, <Sparkles key="sparkles" className="w-5 h-5 text-secondary" />][i % 6]}
                   </div>
-                  <h3 className="font-bold text-ivory mb-2 text-base">{f.title}</h3>
+                  <h3 className="font-bold text-primary mb-2 text-base" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>{f.title}</h3>
                   <p className="text-sm text-taupe leading-relaxed">{f.desc}</p>
                 </div>
               </div>
@@ -212,8 +243,8 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
       <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-primary text-xs font-bold uppercase tracking-widest mb-3">Directory</span>
-            <h2 className="font-black text-3xl md:text-4xl text-primary">Featured Diseases</h2>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-primary text-xs font-bold uppercase tracking-widest mb-3"><BookOpen className="w-3 h-3" /> Directory</span>
+            <h2 className="font-black text-3xl md:text-4xl text-primary" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>Featured Diseases</h2>
             <p className="text-taupe mt-1.5 font-medium">Explore conditions in our database</p>
           </div>
           <button onClick={() => onNav("directory")} className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-primary border border-taupe-40 rounded-xl px-4 py-2 hover:bg-secondary transition-all duration-200">
@@ -226,14 +257,14 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="flex items-center justify-center gap-6 py-8 border-y border-secondary/30">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent to-secondary/40" />
+        <div className="flex items-center justify-center gap-6 py-8 border-y border-taupe-20">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent to-taupe-30" />
           <div className="flex items-center gap-3 text-taupe">
             <ZebraMascot size={32} />
             <span className="text-sm font-semibold">The zebra symbolizes rare diseases — when you hear hoofbeats, think zebras.</span>
             <ZebraMascot size={32} className="scale-x-[-1]" />
           </div>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent to-secondary/40" />
+          <div className="flex-1 h-px bg-gradient-to-l from-transparent to-taupe-30" />
         </div>
       </section>
 
@@ -244,11 +275,15 @@ export default function HomePage({ onNav, onDisease }: { onNav: (v: string) => v
           <div className="w-14 h-14 mx-auto mb-6 bg-white/15 rounded-2xl flex items-center justify-center">
             <Heart className="w-7 h-7 text-secondary" />
           </div>
-          <h2 className="font-black text-3xl md:text-4xl text-ivory mb-4">You Are Not Alone</h2>
+          <h2 className="font-black text-3xl md:text-4xl text-ivory mb-4" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>You Are Not Alone</h2>
           <p className="text-secondary/80 text-lg mb-8 max-w-xl mx-auto">Thousands of families are walking the same road. RareBridge is here to help you find answers, specialists, and community.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <button className="px-8 py-3 rounded-2xl bg-secondary text-primary font-bold hover:bg-white transition-all duration-200 shadow-lg">Get Started Free</button>
-            <button className="px-8 py-3 rounded-2xl border-2 border-white/30 text-ivory font-bold hover:bg-white/10 transition-all duration-200">Talk to a Specialist</button>
+            <button className="px-8 py-3 rounded-2xl bg-secondary text-primary font-bold hover:bg-white transition-all duration-200 shadow-lg flex items-center gap-2">
+              <Zap className="w-4 h-4" /> Get Started Free
+            </button>
+            <button className="px-8 py-3 rounded-2xl border-2 border-white/30 text-ivory font-bold hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
+              <Users className="w-4 h-4" /> Talk to a Specialist
+            </button>
           </div>
         </div>
       </section>

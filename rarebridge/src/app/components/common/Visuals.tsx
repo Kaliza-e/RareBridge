@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Bot, Star,
-  AlertCircle, Stethoscope, ClipboardList, Syringe, Users as UsersIcon, Microscope as MicroscopeIcon
+  AlertCircle, Stethoscope, ClipboardList, Syringe, Users as UsersIcon, Microscope as MicroscopeIcon,
+  Thermometer, HeartPulse, Pill, Users, FlaskConical, UserCircle, BookOpen, Sparkles, Zap, Trophy, Target,
+  Flame, Award, CheckCircle, XCircle, Lock
 } from "lucide-react";
 import { Disease } from "../../data";
 
@@ -32,6 +34,52 @@ export function ZebraDoodle({ className = "" }: { className?: string }) {
   );
 }
 
+export function ZebraWithButterfly({ size = 120, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 120 120" className={className} fill="none" aria-hidden="true">
+      {/* Zebra body */}
+      <ellipse cx="60" cy="75" rx="35" ry="25" fill="var(--secondary)" />
+      {/* Zebra head */}
+      <ellipse cx="60" cy="50" rx="22" ry="28" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="2" />
+      {/* Zebra stripes */}
+      <path d="M45 35 Q52 32 58 33 Q62 32 68 35" stroke="var(--accent)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M42 45 Q52 42 60 43 Q68 42 78 45" stroke="var(--primary)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      {/* Zebra eyes */}
+      <circle cx="50" cy="42" r="4" fill="var(--primary)" />
+      <circle cx="70" cy="42" r="4" fill="var(--primary)" />
+      <circle cx="51" cy="41" r="1.5" fill="white" />
+      <circle cx="71" cy="41" r="1.5" fill="white" />
+      {/* Zebra ears */}
+      <ellipse cx="42" cy="28" rx="6" ry="8" fill="var(--secondary)" transform="rotate(-20 42 28)" />
+      <ellipse cx="78" cy="28" rx="6" ry="8" fill="var(--secondary)" transform="rotate(20 78 28)" />
+      {/* Zebra legs */}
+      <rect x="40" y="90" width="8" height="20" rx="4" fill="var(--secondary)" />
+      <rect x="55" y="90" width="8" height="20" rx="4" fill="var(--secondary)" />
+      <rect x="70" y="90" width="8" height="20" rx="4" fill="var(--secondary)" />
+      
+      {/* Butterfly */}
+      <g className="animate-float" style={{ animationDelay: '0.5s' }}>
+        {/* Left wing */}
+        <ellipse cx="95" cy="35" rx="12" ry="8" fill="var(--primary)" opacity="0.8" transform="rotate(-30 95 35)" />
+        <ellipse cx="92" cy="42" rx="8" ry="6" fill="var(--accent)" opacity="0.7" transform="rotate(-20 92 42)" />
+        {/* Right wing */}
+        <ellipse cx="105" cy="35" rx="12" ry="8" fill="var(--primary)" opacity="0.8" transform="rotate(30 105 35)" />
+        <ellipse cx="108" cy="42" rx="8" ry="6" fill="var(--accent)" opacity="0.7" transform="rotate(20 108 42)" />
+        {/* Butterfly body */}
+        <ellipse cx="100" cy="38" rx="2" ry="6" fill="var(--switch-background)" />
+        {/* Butterfly antennae */}
+        <path d="M98 33 Q95 30 96 28" stroke="var(--switch-background)" strokeWidth="1" fill="none" />
+        <path d="M102 33 Q105 30 104 28" stroke="var(--switch-background)" strokeWidth="1" fill="none" />
+      </g>
+      
+      {/* Sparkles around butterfly */}
+      <circle cx="88" cy="28" r="2" fill="var(--secondary)" className="animate-sparkle" />
+      <circle cx="112" cy="30" r="1.5" fill="var(--primary)" className="animate-sparkle" style={{ animationDelay: '0.3s' }} />
+      <circle cx="100" cy="25" r="1" fill="var(--accent)" className="animate-sparkle" style={{ animationDelay: '0.6s' }} />
+    </svg>
+  );
+}
+
 export function ZebraEmptyState({ message, sub }: { message: string; sub?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -39,6 +87,60 @@ export function ZebraEmptyState({ message, sub }: { message: string; sub?: strin
       <p className="font-bold text-primary text-lg">{message}</p>
       {sub && <p className="text-sm text-taupe mt-1 max-w-xs">{sub}</p>}
     </div>
+  );
+}
+
+export function EdelweissFlower({ size = 80, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" className={className} fill="none" aria-hidden="true">
+      {/* Stem */}
+      <path d="M50 70 Q52 80 50 95" stroke="var(--switch-background)" strokeWidth="3" fill="none" strokeLinecap="round" />
+      {/* Leaves */}
+      <path d="M50 75 Q35 70 30 60 Q40 65 50 72" fill="var(--secondary)" opacity="0.7" />
+      <path d="M50 78 Q65 73 70 63 Q60 68 50 75" fill="var(--secondary)" opacity="0.7" />
+      {/* Petals - star-shaped edelweiss */}
+      <g className="animate-sparkle">
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(0 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(45 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(90 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(135 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(180 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(225 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(270 50 50)" />
+        <ellipse cx="50" cy="35" rx="8" ry="20" fill="var(--background)" stroke="var(--switch-background)" strokeWidth="1.5" transform="rotate(315 50 50)" />
+      </g>
+      {/* Center */}
+      <circle cx="50" cy="50" r="12" fill="var(--primary)" opacity="0.9" />
+      <circle cx="50" cy="50" r="8" fill="var(--accent)" opacity="0.8" />
+      {/* Fuzzy texture dots */}
+      <circle cx="50" cy="45" r="1.5" fill="var(--secondary)" opacity="0.6" />
+      <circle cx="46" cy="50" r="1.5" fill="var(--secondary)" opacity="0.6" />
+      <circle cx="54" cy="50" r="1.5" fill="var(--secondary)" opacity="0.6" />
+      <circle cx="50" cy="55" r="1.5" fill="var(--secondary)" opacity="0.6" />
+    </svg>
+  );
+}
+
+export function ButterflyDoodle({ size = 60, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 80 80" className={`${className} animate-float`} fill="none" aria-hidden="true">
+      {/* Left wings */}
+      <ellipse cx="25" cy="30" rx="15" ry="12" fill="var(--primary)" opacity="0.8" transform="rotate(-25 25 30)" />
+      <ellipse cx="22" cy="42" rx="10" ry="8" fill="var(--accent)" opacity="0.7" transform="rotate(-15 22 42)" />
+      {/* Right wings */}
+      <ellipse cx="55" cy="30" rx="15" ry="12" fill="var(--primary)" opacity="0.8" transform="rotate(25 55 30)" />
+      <ellipse cx="58" cy="42" rx="10" ry="8" fill="var(--accent)" opacity="0.7" transform="rotate(15 58 42)" />
+      {/* Body */}
+      <ellipse cx="40" cy="38" rx="3" ry="10" fill="var(--switch-background)" />
+      {/* Antennae */}
+      <path d="M38 30 Q35 25 36 22" stroke="var(--switch-background)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M42 30 Q45 25 44 22" stroke="var(--switch-background)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      {/* Wing patterns */}
+      <circle cx="20" cy="28" r="3" fill="var(--secondary)" opacity="0.5" />
+      <circle cx="60" cy="28" r="3" fill="var(--secondary)" opacity="0.5" />
+      <circle cx="25" cy="40" r="2" fill="var(--primary)" opacity="0.4" />
+      <circle cx="55" cy="40" r="2" fill="var(--primary)" opacity="0.4" />
+    </svg>
   );
 }
 
@@ -91,6 +193,115 @@ export function useHoofSound() {
   }, []);
 }
 
+export function usePopSound() {
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  return useCallback(() => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+
+      let ctx = audioContextRef.current;
+      if (!ctx) {
+        ctx = new AudioContext();
+        audioContextRef.current = ctx;
+      }
+
+      if (ctx.state === "suspended") {
+        void ctx.resume();
+      }
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } catch (error) {
+      console.warn("Pop sound failed to play", error);
+    }
+  }, []);
+}
+
+export function useChimeSound() {
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  return useCallback(() => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+
+      let ctx = audioContextRef.current;
+      if (!ctx) {
+        ctx = new AudioContext();
+        audioContextRef.current = ctx;
+      }
+
+      if (ctx.state === "suspended") {
+        void ctx.resume();
+      }
+
+      const now = ctx.currentTime;
+      
+      // Create a very soft, gentle chime
+      const frequencies = [523.25, 659.25]; // C5, E5 (softer chord)
+      frequencies.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.02, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      });
+    } catch (error) {
+      console.warn("Chime sound failed to play", error);
+    }
+  }, []);
+}
+
+export function useSparkleSound() {
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  return useCallback(() => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+
+      let ctx = audioContextRef.current;
+      if (!ctx) {
+        ctx = new AudioContext();
+        audioContextRef.current = ctx;
+      }
+
+      if (ctx.state === "suspended") {
+        void ctx.resume();
+      }
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+      gain.gain.setValueAtTime(0.015, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch (error) {
+      console.warn("Sparkle sound failed to play", error);
+    }
+  }, []);
+}
+
 // Small helper that attaches mousemove to update particle CSS vars
 if (typeof window !== "undefined") {
   try {
@@ -132,6 +343,99 @@ export function BackgroundParticles() {
       <span className="particle-dot left-[84%] top-[72%]" style={{ transform: `translate(var(--p-x3,0), var(--p-y3,0))` }} />
       <span className="particle-dot left-[20%] top-[68%]" style={{ transform: `translate(var(--p-x4,0), var(--p-y4,0))` }} />
       <span className="particle-dot left-[54%] top-[36%] animate-twinkle" style={{ transform: `translate(var(--p-x5,0), var(--p-y5,0))` }} />
+    </div>
+  );
+}
+
+export function FlyingZebra() {
+  const [position, setPosition] = useState({ x: -150, y: 100 });
+  const [greeting, setGreeting] = useState("");
+  const [showGreeting, setShowGreeting] = useState(false);
+  const [direction, setDirection] = useState(1);
+
+  const greetings = [
+    "Hi there! 👋",
+    "Hello friend! 🌟",
+    "Welcome! 🦓",
+    "So glad you're here! 💫",
+    "Explore with me! 🦋",
+    "Let's learn together! 📚"
+  ];
+
+  useEffect(() => {
+    let animationFrame: number;
+    let lastTime = Date.now();
+    let x = -150;
+    let y = 100;
+    let targetY = 100;
+    let dir = 1;
+
+    const animate = () => {
+      const now = Date.now();
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+
+      // Move horizontally
+      x += dir * 80 * delta;
+
+      // Smooth vertical movement with some randomness
+      if (Math.random() < 0.02) {
+        targetY = 50 + Math.random() * 200;
+      }
+      y += (targetY - y) * 2 * delta;
+
+      // Bounce off edges
+      if (x > window.innerWidth + 150) {
+        x = -150;
+        dir = 1;
+        setDirection(1);
+      } else if (x < -150) {
+        x = window.innerWidth + 150;
+        dir = -1;
+        setDirection(-1);
+      }
+
+      setPosition({ x, y });
+      setDirection(dir);
+      animationFrame = requestAnimationFrame(animate);
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    // Show random greetings periodically
+    const greetingInterval = setInterval(() => {
+      const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+      setGreeting(randomGreeting);
+      setShowGreeting(true);
+      setTimeout(() => setShowGreeting(false), 2000);
+    }, 5000);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      clearInterval(greetingInterval);
+    };
+  }, []);
+
+  return (
+    <div 
+      className="fixed pointer-events-none z-50 transition-transform duration-100"
+      style={{ 
+        left: position.x, 
+        top: position.y,
+        transform: direction === -1 ? 'scaleX(-1)' : 'scaleX(1)'
+      }}
+    >
+      <div className="relative">
+        <ZebraWithButterfly size={80} />
+        {showGreeting && (
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-2xl shadow-xl border-2 border-primary animate-bounce whitespace-nowrap">
+            <span className="text-sm font-bold text-primary" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>
+              {greeting}
+            </span>
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -263,53 +567,166 @@ export function HeroIllustration() {
 // (imports consolidated at top)
 
 export const JOURNEY_STEPS = [
-  { icon: AlertCircle, label: "Symptoms", desc: "Unusual signs appear — unexplained delays, weakness, or changes in behavior." },
-  { icon: Stethoscope, label: "Doctor Visit", desc: "Your family doctor refers you to a specialist for further evaluation." },
-  { icon: ClipboardList, label: "Diagnosis", desc: "Genetic tests, enzyme panels, or imaging confirm the rare disease." },
-  { icon: Syringe, label: "Treatment", desc: "A care team creates a personalized management and therapy plan." },
-  { icon: UsersIcon, label: "Community", desc: "Connect with families and organizations who share your experience." },
-  { icon: MicroscopeIcon, label: "Research", desc: "Follow the organizations working toward treatments and cures." },
+  { icon: Thermometer, label: "Meet the Disease", desc: "Unusual signs appear — unexplained delays, weakness, or changes in behavior.", color: "bg-red-100 text-red-600", pinColor: "#EF4444" },
+  { icon: Stethoscope, label: "What Happens?", desc: "Your family doctor refers you to a specialist for further evaluation.", color: "bg-blue-100 text-blue-600", pinColor: "#3B82F6" },
+  { icon: ClipboardList, label: "Diagnosis", desc: "Genetic tests, enzyme panels, or imaging confirm the rare disease.", color: "bg-purple-100 text-purple-600", pinColor: "#8B5CF6" },
+  { icon: Pill, label: "Treatment", desc: "A care team creates a personalized management and therapy plan.", color: "bg-green-100 text-green-600", pinColor: "#10B981" },
+  { icon: Users, label: "Living & Support", desc: "Connect with families and organizations who share your experience.", color: "bg-yellow-100 text-yellow-600", pinColor: "#F59E0B" },
 ];
 
 export function PatientJourney() {
   const [activeStep, setActiveStep] = useState(0);
   return (
-    <section className="py-20 bg-white">
+    <section className="py-24 bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-accent text-xs font-bold mb-4">
-            <MicroscopeIcon className="w-3 h-3" /> Patient Journey
-          </div>
-          <h2 className="font-black text-3xl md:text-4xl text-primary mb-4">What Families Typically Experience</h2>
+        <div className="text-center mb-16">
+          <h2 className="font-black text-4xl md:text-5xl text-ivory mb-4" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>BEST JOURNEY ROUTE</h2>
+          <p className="text-secondary text-lg">Your adventure through understanding rare diseases</p>
         </div>
 
-        <div className="relative">
-          <div className="absolute left-1/2 top-0 h-full w-1 -translate-x-1/2 bg-secondary" />
-          <div className="absolute inset-x-0 top-1/2 h-1 bg-secondary" />
+        <div className="relative mb-16">
+          {/* Winding Road SVG */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+            {/* Road shadow */}
+            <path 
+              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
+              stroke="rgba(0,0,0,0.3)" 
+              strokeWidth="60" 
+              fill="none" 
+              strokeLinecap="round"
+            />
+            {/* Road */}
+            <path 
+              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
+              stroke="#1E3A5F" 
+              strokeWidth="50" 
+              fill="none" 
+              strokeLinecap="round"
+            />
+            {/* Road border */}
+            <path 
+              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
+              stroke="white" 
+              strokeWidth="54" 
+              fill="none" 
+              strokeLinecap="round"
+            />
+            <path 
+              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
+              stroke="#1E3A5F" 
+              strokeWidth="50" 
+              fill="none" 
+              strokeLinecap="round"
+            />
+            {/* Dashed center line */}
+            <path 
+              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
+              stroke="white" 
+              strokeWidth="3" 
+              fill="none" 
+              strokeDasharray="20 20"
+              strokeLinecap="round"
+            />
+          </svg>
 
-          <div className="relative grid gap-10 md:grid-cols-3">
+          {/* Step Bubbles */}
+          <div className="relative h-[600px]">
             {JOURNEY_STEPS.map((step, i) => {
               const Icon = step.icon as any;
-              const isTop = i % 2 === 0;
+              const isActive = activeStep === i;
+              const positions = [
+                { x: 15, y: 80 },
+                { x: 35, y: 55 },
+                { x: 55, y: 35 },
+                { x: 75, y: 20 },
+                { x: 90, y: 8 },
+              ];
+              const pos = positions[i];
+              const isLeft = i % 2 === 0;
+              
               return (
-                <button key={step.label} onClick={() => setActiveStep(i)} className="relative flex flex-col items-center text-center md:text-left">
-                  <div className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-4 ${activeStep === i ? "border-primary bg-primary text-secondary shadow-lg" : "border-secondary bg-white text-primary"}`}>
-                    <Icon className="h-6 w-6" />
+                <button
+                  key={step.label}
+                  onClick={() => setActiveStep(i)}
+                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${isActive ? 'scale-110' : 'hover:scale-105'} sound-effect-pop`}
+                  style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                >
+                  {/* Location Pin */}
+                  <div className="relative">
+                    <svg width="60" height="80" viewBox="0 0 60 80" className="drop-shadow-lg">
+                      <path 
+                        d="M30 0 C13.4 0 0 13.4 0 30 C0 52.5 30 80 30 80 C30 80 60 52.5 60 30 C60 13.4 46.6 0 30 0 Z" 
+                        fill={step.pinColor}
+                      />
+                      <circle cx="30" cy="30" r="15" fill="white" />
+                    </svg>
+                    {/* Icon inside pin */}
+                    <div className="absolute inset-0 flex items-center justify-center pt-2">
+                      <Icon className="w-6 h-6" style={{ color: step.pinColor }} />
+                    </div>
+                    {/* Step number */}
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center font-black text-sm shadow-md" style={{ color: step.pinColor }}>
+                      {i + 1}
+                    </div>
                   </div>
-                  <div className={`mt-6 rounded-[2rem] border border-secondary bg-white p-6 shadow-sm transition-transform duration-200 ${activeStep === i ? "scale-105 shadow-xl" : "hover:-translate-y-1"}`}>
-                    <h3 className="font-bold text-primary mb-2">{step.label}</h3>
-                    <p className="text-sm text-accent leading-relaxed">{step.desc}</p>
+                  
+                  {/* Step bubble */}
+                  <div className={`absolute ${isLeft ? 'right-16' : 'left-16'} top-1/2 -translate-y-1/2 w-48 p-4 rounded-2xl shadow-xl transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-white scale-105 border-4 border-accent' 
+                      : 'bg-white/90 hover:bg-white border-2 border-white'
+                  }`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className="w-5 h-5" style={{ color: step.pinColor }} />
+                      <h3 className="font-black text-primary text-sm" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>{step.label}</h3>
+                    </div>
+                    <p className="text-xs text-accent leading-relaxed">{step.desc}</p>
                   </div>
-                  <span className={`absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-white border border-secondary ${isTop ? "-translate-y-1/2" : "translate-y-1/2"}`} />
                 </button>
               );
             })}
           </div>
         </div>
-        <div className="mt-12 rounded-3xl bg-primary p-8 md:p-10 text-white shadow-2xl">
-          <div className="text-taupe text-xs font-bold uppercase tracking-widest mb-1">Step {activeStep + 1} of {JOURNEY_STEPS.length}</div>
-          <h3 className="font-black text-3xl mb-3">{JOURNEY_STEPS[activeStep].label}</h3>
-          <p className="text-secondary text-lg leading-relaxed max-w-3xl">{JOURNEY_STEPS[activeStep].desc}</p>
+
+        {/* Detail Card */}
+        <div className="rounded-3xl bg-white p-8 md:p-10 shadow-2xl">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="animate-bounce" style={{ animationDelay: '0s' }}>
+              <ZebraMascot size={32} />
+            </div>
+            <div className="text-primary text-sm font-bold uppercase tracking-widest">Step {activeStep + 1} of {JOURNEY_STEPS.length}</div>
+            <div className="animate-bounce" style={{ animationDelay: '0.5s' }}>
+              <ZebraMascot size={32} className="scale-x-[-1]" />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            {(() => {
+              const Icon = JOURNEY_STEPS[activeStep].icon as any;
+              return <Icon className="w-12 h-12" style={{ color: JOURNEY_STEPS[activeStep].pinColor }} />;
+            })()}
+            <h3 className="font-black text-3xl md:text-4xl text-center text-primary" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>{JOURNEY_STEPS[activeStep].label}</h3>
+          </div>
+          <p className="text-accent text-lg md:text-xl leading-relaxed max-w-3xl mx-auto text-center">{JOURNEY_STEPS[activeStep].desc}</p>
+          <div className="flex justify-center gap-3 mt-6">
+            {JOURNEY_STEPS.map((step, i) => {
+              const Icon = step.icon as any;
+              const isActive = i === activeStep;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setActiveStep(i)}
+                  className={`w-12 h-12 rounded-full transition-all duration-300 flex items-center justify-center ${
+                    isActive 
+                      ? "scale-125 shadow-lg" 
+                      : "hover:scale-110"
+                  }`}
+                  style={{ backgroundColor: isActive ? step.pinColor : `${step.pinColor}30` }}
+                >
+                  <Icon className="w-6 h-6 text-white" />
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
@@ -340,21 +757,23 @@ export function DiseaseCard({ disease, onClick }: { disease: Disease; onClick: (
   const c = COLOR_MAP[disease.color] ?? COLOR_MAP.navy;
   const Icon = disease.icon as any;
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-taupe-30 bg-white shadow-sm transition-transform duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:border-accent/40 cursor-pointer" onClick={onClick}>
-      <div className="absolute inset-x-6 top-0 h-40 rounded-[1.75rem] bg-gradient-to-br from-secondary/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
+    <div className="group relative overflow-hidden rounded-3xl border-2 border-taupe-30 bg-white shadow-md transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-accent/60 hover:scale-105 cursor-pointer sound-effect-pop" onClick={onClick}>
       <div className={`relative px-6 pt-6 pb-4`}>
         <div className="flex items-start justify-between mb-3">
-          <div className={`w-12 h-12 rounded-2xl ${c.iconBg} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105`}>
+          <div className={`w-12 h-12 rounded-2xl ${c.iconBg} flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
             <Icon className="w-6 h-6 text-ivory" />
           </div>
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent-10 text-accent`}>{(disease as any).researchStatus || 'Research'}</span>
         </div>
-        <h3 className="font-black text-primary text-lg leading-tight">{disease.name}</h3>
+        <h3 className="font-black text-primary text-lg leading-tight" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>{disease.name}</h3>
         <p className="text-xs text-taupe mt-0.5 font-medium">{disease.category}</p>
       </div>
       <div className="px-6 pb-6 pt-4">
         <p className="text-sm text-accent leading-relaxed mb-4">{disease.shortDesc}</p>
-        <button className="flex items-center gap-1 text-sm font-bold text-primary group-hover:gap-2 transition-all">View Disease</button>
+        <button className="flex items-center gap-1 text-sm font-bold text-primary group-hover:gap-2 transition-all">
+          View Disease 
+          <span className="group-hover:translate-x-1 transition-transform">→</span>
+        </button>
       </div>
     </div>
   );

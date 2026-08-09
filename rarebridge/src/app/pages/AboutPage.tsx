@@ -1,5 +1,5 @@
 import React from "react";
-import { ZebraMascot, ZebraDoodle } from "../components/common/Visuals";
+import { ZebraMascot, ZebraDoodle, ButterflyDoodle, EdelweissFlower } from "../components/common/Visuals";
 import { Heart, Shield, Users, Microscope, BookOpen, Star, ArrowRight } from "lucide-react";
 
 const VALUES = [
@@ -44,6 +44,16 @@ export default function AboutPage() {
           <div className="absolute bottom-0 right-0 w-[300px] h-[300px] rounded-full bg-accent opacity-5 blur-[80px]" />
           <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
             <ZebraMascot size={220} />
+          </div>
+          {/* Floating doodles */}
+          <div className="absolute top-16 left-12 animate-float" style={{ animationDelay: '0s' }}>
+            <ButterflyDoodle size={40} className="opacity-30" />
+          </div>
+          <div className="absolute top-32 right-32 animate-float" style={{ animationDelay: '1.2s' }}>
+            <EdelweissFlower size={50} className="opacity-25" />
+          </div>
+          <div className="absolute bottom-20 left-1/3 animate-float" style={{ animationDelay: '0.6s' }}>
+            <ButterflyDoodle size={35} className="opacity-20" />
           </div>
         </div>
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
