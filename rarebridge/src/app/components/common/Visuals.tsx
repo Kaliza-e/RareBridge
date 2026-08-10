@@ -353,14 +353,6 @@ export function FlyingZebra() {
   const [showGreeting, setShowGreeting] = useState(false);
   const [direction, setDirection] = useState(1);
 
-  const greetings = [
-    "Hi there! 👋",
-    "Hello friend! 🌟",
-    "Welcome! 🦓",
-    "So glad you're here! 💫",
-    "Explore with me! 🦋",
-    "Let's learn together! 📚"
-  ];
 
   useEffect(() => {
     let animationFrame: number;
@@ -401,19 +393,6 @@ export function FlyingZebra() {
     };
 
     animationFrame = requestAnimationFrame(animate);
-
-    // Show random greetings periodically
-    const greetingInterval = setInterval(() => {
-      const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-      setGreeting(randomGreeting);
-      setShowGreeting(true);
-      setTimeout(() => setShowGreeting(false), 2000);
-    }, 5000);
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-      clearInterval(greetingInterval);
-    };
   }, []);
 
   return (
@@ -427,14 +406,6 @@ export function FlyingZebra() {
     >
       <div className="relative">
         <ZebraWithButterfly size={80} />
-        {showGreeting && (
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-2xl shadow-xl border-2 border-primary animate-bounce whitespace-nowrap">
-            <span className="text-sm font-bold text-primary" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>
-              {greeting}
-            </span>
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
-          </div>
-        )}
       </div>
     </div>
   );
@@ -479,7 +450,7 @@ export function AIAssistant() {
         aria-label="Open AI Assistant"
       >
         <Bot className="w-5 h-5" />
-        <span className="hidden sm:inline">Ask AI</span>
+        <span className="hidden sm:inline">RareBridge</span>
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
