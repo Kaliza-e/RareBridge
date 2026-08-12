@@ -30,7 +30,25 @@ export default function DiseasePage({ disease, onBack }: { disease: Disease; onB
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Left side curvy lines */}
+      <svg className="fixed left-0 top-0 h-full w-32 pointer-events-none opacity-10" viewBox="0 0 100 1000" preserveAspectRatio="none">
+        <path d="M20 0 Q50 100 20 200 T20 400 T20 600 T20 800 T20 1000" stroke="var(--primary)" strokeWidth="3" fill="none" />
+        <path d="M40 0 Q70 150 40 300 T40 600 T40 900 T40 1000" stroke="var(--purple)" strokeWidth="2" fill="none" />
+        <path d="M60 0 Q90 200 60 400 T60 800 T60 1000" stroke="var(--green)" strokeWidth="2" fill="none" />
+        <path d="M10 100 Q40 150 10 200 T10 300 T10 400" stroke="var(--accent)" strokeWidth="2" fill="none" />
+        <path d="M80 200 Q50 250 80 300 T80 400 T80 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
+      </svg>
+
+      {/* Right side curvy lines */}
+      <svg className="fixed right-0 top-0 h-full w-32 pointer-events-none opacity-10" viewBox="0 0 100 1000" preserveAspectRatio="none">
+        <path d="M80 0 Q50 100 80 200 T80 400 T80 600 T80 800 T80 1000" stroke="var(--primary)" strokeWidth="3" fill="none" />
+        <path d="M60 0 Q30 150 60 300 T60 600 T60 900 T60 1000" stroke="var(--purple)" strokeWidth="2" fill="none" />
+        <path d="M40 0 Q10 200 40 400 T40 800 T40 1000" stroke="var(--green)" strokeWidth="2" fill="none" />
+        <path d="M90 100 Q60 150 90 200 T90 300 T90 400" stroke="var(--accent)" strokeWidth="2" fill="none" />
+        <path d="M20 200 Q50 250 20 300 T20 400 T20 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
+      </svg>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <button onClick={onBack} className="flex items-center gap-2 text-sm font-semibold text-accent hover:text-primary mb-8 group transition-colors"><ChevronDown className="w-4 h-4 rotate-90 group-hover:-translate-x-0.5 transition-transform" />Back to Directory</button>
 
       <div className="bg-primary rounded-3xl p-8 md:p-12 mb-8 relative overflow-hidden">
@@ -96,6 +114,7 @@ export default function DiseasePage({ disease, onBack }: { disease: Disease; onB
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

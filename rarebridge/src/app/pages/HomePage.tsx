@@ -140,6 +140,7 @@ export default function HomePage({
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Disease[]>([]);
+
   const [heroVisible, setHeroVisible] = useState(false);
 
   /* -------------------------------------------------------
@@ -216,15 +217,62 @@ export default function HomePage({
   ];
 
   return (
-    <div className="w-full overflow-hidden bg-white">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Left side curvy lines */}
+      <svg className="fixed left-0 top-0 h-full w-32 pointer-events-none opacity-10" viewBox="0 0 100 1000" preserveAspectRatio="none">
+        <path d="M20 0 Q50 100 20 200 T20 400 T20 600 T20 800 T20 1000" stroke="var(--primary)" strokeWidth="3" fill="none" />
+        <path d="M40 0 Q70 150 40 300 T40 600 T40 900 T40 1000" stroke="var(--purple)" strokeWidth="2" fill="none" />
+        <path d="M60 0 Q90 200 60 400 T60 800 T60 1000" stroke="var(--green)" strokeWidth="2" fill="none" />
+        <path d="M10 100 Q40 150 10 200 T10 300 T10 400" stroke="var(--accent)" strokeWidth="2" fill="none" />
+        <path d="M80 200 Q50 250 80 300 T80 400 T80 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
+      </svg>
+
+      {/* Right side curvy lines */}
+      <svg className="fixed right-0 top-0 h-full w-32 pointer-events-none opacity-10" viewBox="0 0 100 1000" preserveAspectRatio="none">
+        <path d="M80 0 Q50 100 80 200 T80 400 T80 600 T80 800 T80 1000" stroke="var(--primary)" strokeWidth="3" fill="none" />
+        <path d="M60 0 Q30 150 60 300 T60 600 T60 900 T60 1000" stroke="var(--purple)" strokeWidth="2" fill="none" />
+        <path d="M40 0 Q10 200 40 400 T40 800 T40 1000" stroke="var(--green)" strokeWidth="2" fill="none" />
+        <path d="M90 100 Q60 150 90 200 T90 300 T90 400" stroke="var(--accent)" strokeWidth="2" fill="none" />
+        <path d="M20 200 Q50 250 20 300 T20 400 T20 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
+      </svg>
 
       {/* =====================================================
           HERO
       ===================================================== */}
 
       <section className="relative overflow-hidden bg-gradient-to-b from-[#F8FAFD] via-white to-white">
+        {/* Curvy decorative lines in hero */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" viewBox="0 0 1000 600">
+          <path d="M0 100 Q250 50 500 100 T1000 100" stroke="var(--primary)" strokeWidth="3" fill="none" />
+          <path d="M0 200 Q250 150 500 200 T1000 200" stroke="var(--purple)" strokeWidth="2" fill="none" />
+          <path d="M0 300 Q250 250 500 300 T1000 300" stroke="var(--green)" strokeWidth="2" fill="none" />
+          <path d="M0 400 Q250 350 500 400 T1000 400" stroke="var(--accent)" strokeWidth="2" fill="none" />
+          <path d="M0 500 Q250 450 500 500 T1000 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
+          <path d="M100 0 Q150 150 100 300 T100 600" stroke="var(--primary)" strokeWidth="2" fill="none" />
+          <path d="M900 0 Q850 150 900 300 T900 600" stroke="var(--purple)" strokeWidth="2" fill="none" />
+        </svg>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10 md:pt-28 md:pb-14 flex flex-col items-center text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10 md:pt-28 md:pb-14 flex flex-col items-center text-center relative z-10">
+
+          {/* Floating doodles in hero */}
+          <div className="absolute top-10 left-10 animate-float opacity-20" style={{ animationDelay: '0s' }}>
+            <ButterflyDoodle size={40} />
+          </div>
+          <div className="absolute top-20 right-16 animate-float opacity-20" style={{ animationDelay: '1s' }}>
+            <EdelweissFlower size={50} />
+          </div>
+          <div className="absolute bottom-20 left-20 animate-float opacity-20" style={{ animationDelay: '2s' }}>
+            <ButterflyDoodle size={35} />
+          </div>
+          <div className="absolute bottom-32 right-10 animate-float opacity-20" style={{ animationDelay: '0.5s' }}>
+            <EdelweissFlower size={45} />
+          </div>
+          <div className="absolute top-60 left-1/4 animate-float opacity-15" style={{ animationDelay: '1.5s' }}>
+            <ZebraMascot size={28} />
+          </div>
+          <div className="absolute bottom-60 right-1/4 animate-float opacity-15" style={{ animationDelay: '2.5s' }}>
+            <ZebraMascot size={24} className="scale-x-[-1]" />
+          </div>
 
           {/* Trust badge */}
 
@@ -265,7 +313,7 @@ export default function HomePage({
           >
             <ZebraWithButterfly
               size={140}
-              className="animate-float sound-effect-sparkle cursor-pointer"
+              className="animate-float cursor-pointer"
             />
           </div>
 
@@ -382,6 +430,8 @@ export default function HomePage({
                   text-sm
                   font-bold
                   hover:bg-accent
+                  hover:scale-105
+                  hover:shadow-lg
                   transition-all
                   duration-200
                   shadow
@@ -528,15 +578,20 @@ export default function HomePage({
                 font-bold
                 hover:bg-primary
                 hover:text-ivory
+                hover:scale-105
+                hover:shadow-lg
                 transition-all
                 duration-200
                 flex
                 items-center
                 gap-2
                 shadow-sm
+                relative
+                overflow-hidden
               "
             >
-              <Users className="w-4 h-4" />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <Users className="w-4 h-4 relative z-10" />
 
               Find Support
 
@@ -550,6 +605,7 @@ export default function HomePage({
                   group-hover:translate-x-0
                   transition-all
                   duration-200
+                  relative z-10
                 "
               />
             </button>
@@ -566,15 +622,20 @@ export default function HomePage({
                 text-ivory
                 font-bold
                 hover:bg-accent
+                hover:scale-105
+                hover:shadow-lg
                 transition-all
                 duration-200
                 flex
                 items-center
                 gap-2
                 shadow-md
+                relative
+                overflow-hidden
               "
             >
-              <Sparkles className="w-4 h-4" />
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              <Sparkles className="w-4 h-4 relative z-10" />
 
               Get Started Free
 
@@ -588,6 +649,7 @@ export default function HomePage({
                   group-hover:translate-x-0
                   transition-all
                   duration-200
+                  relative z-10
                 "
               />
             </button>
@@ -639,6 +701,26 @@ export default function HomePage({
               <EdelweissFlower
                 size={45}
                 className="opacity-50"
+              />
+            </div>
+
+            <div
+              className="absolute top-60 left-1/4 animate-float"
+              style={{ animationDelay: "1.5s" }}
+            >
+              <ZebraMascot
+                size={28}
+                className="opacity-30"
+              />
+            </div>
+
+            <div
+              className="absolute bottom-60 right-1/4 animate-float"
+              style={{ animationDelay: "2.5s" }}
+            >
+              <ZebraMascot
+                size={24}
+                className="opacity-25 scale-x-[-1]"
               />
             </div>
           </div>
@@ -696,7 +778,10 @@ export default function HomePage({
           PATIENT JOURNEY
       ===================================================== */}
 
-      <section className="bg-[#F7F9FC] py-20 md:py-24">
+      <section className="bg-[#F7F9FC] py-20 md:py-24 relative overflow-hidden">
+        {/* Subtle glow effects */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
         <PatientJourney />
       </section>
 
@@ -704,8 +789,12 @@ export default function HomePage({
           EVERYTHING YOU NEED
       ===================================================== */}
 
-      <section className="bg-[#F7F9FC] py-24 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-[#F7F9FC] py-24 md:py-28 relative overflow-hidden">
+        {/* Subtle glow effects */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           {/* Section heading */}
 
@@ -870,8 +959,12 @@ export default function HomePage({
           FEATURED DISEASES
       ===================================================== */}
 
-      <section className="bg-white py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-white py-24 relative overflow-hidden">
+        {/* Subtle glow effects */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div className="flex items-end justify-between mb-10">
 
@@ -954,8 +1047,13 @@ export default function HomePage({
           ZEBRA MESSAGE
       ===================================================== */}
 
-      <section className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="flex items-center justify-center gap-6 py-8 border-y border-[#E8ECF2]">
+      <section className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 relative overflow-hidden">
+        {/* Sparkle effects */}
+        <div className="absolute top-4 left-10 w-2 h-2 bg-primary rounded-full animate-ping opacity-30" />
+        <div className="absolute top-8 right-16 w-1.5 h-1.5 bg-accent rounded-full animate-ping opacity-40" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute bottom-4 left-1/3 w-2 h-2 bg-secondary rounded-full animate-ping opacity-30" style={{ animationDelay: '1s' }} />
+        
+        <div className="flex items-center justify-center gap-6 py-8 border-y border-[#E8ECF2] relative z-10">
 
           <div className="flex-1 h-px bg-gradient-to-r from-transparent to-[#D9E0EA]" />
 
@@ -981,7 +1079,13 @@ export default function HomePage({
           FINAL CTA
       ===================================================== */}
 
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
+        {/* Sparkle effects */}
+        <div className="absolute top-10 left-20 w-2 h-2 bg-primary rounded-full animate-ping opacity-20" />
+        <div className="absolute top-16 right-32 w-1.5 h-1.5 bg-accent rounded-full animate-ping opacity-30" style={{ animationDelay: '0.3s' }} />
+        <div className="absolute bottom-20 left-1/4 w-2 h-2 bg-secondary rounded-full animate-ping opacity-20" style={{ animationDelay: '0.6s' }} />
+        <div className="absolute bottom-32 right-16 w-1.5 h-1.5 bg-primary rounded-full animate-ping opacity-25" style={{ animationDelay: '0.9s' }} />
+        
         <div
           className="
             max-w-4xl
@@ -993,6 +1097,7 @@ export default function HomePage({
             md:p-16
             text-center
             shadow-[0_20px_60px_rgba(17,34,80,0.18)]
+            relative z-10
           "
           style={{
             background:

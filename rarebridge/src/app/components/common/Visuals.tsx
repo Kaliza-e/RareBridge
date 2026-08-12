@@ -144,55 +144,6 @@ export function ButterflyDoodle({ size = 60, className = "" }: { size?: number; 
   );
 }
 
-export function useHoofSound() {
-  const audioContextRef = useRef<AudioContext | null>(null);
-
-  return useCallback(() => {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
-
-      let ctx = audioContextRef.current;
-      if (!ctx) {
-        ctx = new AudioContext();
-        audioContextRef.current = ctx;
-      }
-
-      if (ctx.state === "suspended") {
-        void ctx.resume();
-      }
-
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(95, now);
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.exponentialRampToValueAtTime(0.28, now + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.24);
-
-      const buffer = ctx.createBuffer(1, ctx.sampleRate * 0.16, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i += 1) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
-      }
-      const noise = ctx.createBufferSource();
-      noise.buffer = buffer;
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.18, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-      noise.connect(noiseGain).connect(ctx.destination);
-      noise.start(now);
-      noise.stop(now + 0.14);
-    } catch (error) {
-      console.warn("Hoof sound failed to play", error);
-    }
-  }, []);
-}
-
 export function usePopSound() {
   const audioContextRef = useRef<AudioContext | null>(null);
 

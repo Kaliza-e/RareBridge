@@ -14,7 +14,6 @@ import CommunityPage from "./pages/CommunityPage";
 
 import {
   BackgroundParticles,
-  useHoofSound,
   usePopSound,
   useChimeSound,
   useSparkleSound,
@@ -47,7 +46,6 @@ export default function App() {
   /*
    * Sound hooks
    */
-  const playHoofSound = useHoofSound();
   const playPopSound = usePopSound();
   const playChimeSound = useChimeSound();
   const playSparkleSound = useSparkleSound();
@@ -82,8 +80,7 @@ export default function App() {
         return;
       }
 
-      // Default hoof sound
-      playHoofSound();
+      // No default sound - removed hoof sound to avoid scaring users
     };
 
     document.addEventListener("click", handleGlobalClick);
@@ -92,7 +89,6 @@ export default function App() {
       document.removeEventListener("click", handleGlobalClick);
     };
   }, [
-    playHoofSound,
     playPopSound,
     playChimeSound,
     playSparkleSound,

@@ -63,7 +63,7 @@ export default function Navbar({
         scrolled
           ? "bg-white/98 shadow-[0_1px_24px_0_rgba(0,0,0,0.07)]"
           : "bg-ivory/90"
-      } backdrop-blur-xl border-b border-taupe-40/50`}
+      } backdrop-blur-xl`}
     >
       {/* Navbar container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,8 +223,6 @@ export default function Navbar({
         <div
           className="
             md:hidden
-            border-t
-            border-taupe-40/40
             bg-white/98
             backdrop-blur-xl
             px-4
@@ -286,8 +284,6 @@ export default function Navbar({
               gap-2.5
               pt-3
               pb-1
-              border-t
-              border-taupe-40/40
               mt-2
             "
           >
