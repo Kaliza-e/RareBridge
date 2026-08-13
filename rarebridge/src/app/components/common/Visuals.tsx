@@ -498,111 +498,71 @@ export const JOURNEY_STEPS = [
 
 export function PatientJourney() {
   const [activeStep, setActiveStep] = useState(0);
+
   return (
-    <section className="py-24 bg-primary">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="font-black text-4xl md:text-5xl text-ivory mb-4" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>BEST JOURNEY ROUTE</h2>
-          <p className="text-secondary text-lg">Your adventure through understanding rare diseases</p>
+    <section className="py-24 bg-gradient-to-b from-white to-taupe-20/50 relative overflow-hidden">
+      {/* Elegant Background Curvy Lines */}
+      <div className="absolute inset-0 pointer-events-none opacity-60 z-0">
+        <svg className="w-full h-full text-accent" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-100 600 C 300 400, 600 800, 1000 500 C 1300 300, 1500 600, 1600 500" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.15" fill="none" />
+          <path d="M-100 650 C 400 300, 700 900, 1100 450 C 1400 200, 1500 700, 1600 600" stroke="var(--primary)" strokeWidth="2" strokeOpacity="0.08" fill="none" />
+          <path d="M-100 550 C 200 500, 500 700, 900 600 C 1200 500, 1400 800, 1600 650" stroke="currentColor" strokeWidth="1" strokeOpacity="0.1" fill="none" />
+          <path d="M-100 200 C 300 400, 700 50, 1100 250 C 1300 350, 1500 150, 1600 200" stroke="currentColor" strokeWidth="1" strokeOpacity="0.15" fill="none" />
+          <path d="M-100 150 C 400 100, 800 300, 1200 150 C 1400 50, 1500 250, 1600 150" stroke="var(--primary)" strokeWidth="0.5" strokeOpacity="0.1" fill="none" />
+        </svg>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-20">
+          <h2 className="text-sm font-bold text-accent tracking-widest uppercase mb-3">Diagnostic Journey</h2>
+          <h3 className="text-4xl md:text-5xl font-black text-primary mb-6 tracking-tight">Understanding the Path</h3>
+          <p className="text-accent text-lg max-w-2xl mx-auto">
+            Navigating the complexities of a rare disease can be overwhelming. Here is a guide to what the journey often looks like, step by step.
+          </p>
         </div>
 
-        <div className="relative mb-16">
-          {/* Winding Road SVG */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
-            {/* Road shadow */}
-            <path 
-              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
-              stroke="rgba(0,0,0,0.3)" 
-              strokeWidth="60" 
-              fill="none" 
-              strokeLinecap="round"
-            />
-            {/* Road */}
-            <path 
-              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
-              stroke="#1E3A5F" 
-              strokeWidth="50" 
-              fill="none" 
-              strokeLinecap="round"
-            />
-            {/* Road border */}
-            <path 
-              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
-              stroke="white" 
-              strokeWidth="54" 
-              fill="none" 
-              strokeLinecap="round"
-            />
-            <path 
-              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
-              stroke="#1E3A5F" 
-              strokeWidth="50" 
-              fill="none" 
-              strokeLinecap="round"
-            />
-            {/* Dashed center line */}
-            <path 
-              d="M 100 550 Q 250 450 300 350 T 500 250 T 700 150 T 900 50" 
-              stroke="white" 
-              strokeWidth="3" 
-              fill="none" 
-              strokeDasharray="20 20"
-              strokeLinecap="round"
-            />
-          </svg>
+        {/* Modern Stepper */}
+        <div className="relative max-w-5xl mx-auto mb-24">
+          {/* Connecting Line (Desktop) */}
+          <div className="absolute top-8 left-0 w-full h-1 bg-taupe-20 -translate-y-1/2 rounded-full hidden md:block"></div>
+          <div 
+            className="absolute top-8 left-0 h-1 bg-accent -translate-y-1/2 rounded-full hidden md:block transition-all duration-700 ease-in-out" 
+            style={{ width: `${(activeStep / (JOURNEY_STEPS.length - 1)) * 100}%` }}
+          ></div>
 
-          {/* Step Bubbles */}
-          <div className="relative h-[600px]">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-0 relative z-10">
             {JOURNEY_STEPS.map((step, i) => {
               const Icon = step.icon as any;
               const isActive = activeStep === i;
-              const positions = [
-                { x: 15, y: 80 },
-                { x: 35, y: 55 },
-                { x: 55, y: 35 },
-                { x: 75, y: 20 },
-                { x: 90, y: 8 },
-              ];
-              const pos = positions[i];
-              const isLeft = i % 2 === 0;
-              
+              const isPast = i < activeStep;
+
               return (
                 <button
                   key={step.label}
                   onClick={() => setActiveStep(i)}
-                  className={`absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${isActive ? 'scale-110' : 'hover:scale-105'} sound-effect-pop`}
-                  style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                  className={`group relative flex flex-col items-center gap-4 transition-all duration-300 w-full md:w-32 focus:outline-none`}
                 >
-                  {/* Location Pin */}
-                  <div className="relative">
-                    <svg width="60" height="80" viewBox="0 0 60 80" className="drop-shadow-lg">
-                      <path 
-                        d="M30 0 C13.4 0 0 13.4 0 30 C0 52.5 30 80 30 80 C30 80 60 52.5 60 30 C60 13.4 46.6 0 30 0 Z" 
-                        fill={step.pinColor}
-                      />
-                      <circle cx="30" cy="30" r="15" fill="white" />
-                    </svg>
-                    {/* Icon inside pin */}
-                    <div className="absolute inset-0 flex items-center justify-center pt-2">
-                      <Icon className="w-6 h-6" style={{ color: step.pinColor }} />
-                    </div>
-                    {/* Step number */}
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center font-black text-sm shadow-md" style={{ color: step.pinColor }}>
-                      {i + 1}
-                    </div>
+                  {/* Icon Circle */}
+                  <div 
+                    className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 z-10 ${
+                      isActive 
+                        ? 'bg-accent text-white scale-110 shadow-lg ring-4 ring-white' 
+                        : isPast 
+                          ? 'bg-primary text-white hover:bg-primary-dark ring-4 ring-white' 
+                          : 'bg-white text-taupe border-2 border-taupe-40 hover:border-accent hover:text-accent ring-4 ring-white'
+                    }`}
+                  >
+                    <Icon className="w-7 h-7" />
                   </div>
                   
-                  {/* Step bubble */}
-                  <div className={`absolute ${isLeft ? 'right-16' : 'left-16'} top-1/2 -translate-y-1/2 w-48 p-4 rounded-2xl shadow-xl transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-white scale-105 border-4 border-accent' 
-                      : 'bg-white/90 hover:bg-white border-2 border-white'
-                  }`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon className="w-5 h-5" style={{ color: step.pinColor }} />
-                      <h3 className="font-black text-primary text-sm" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>{step.label}</h3>
-                    </div>
-                    <p className="text-xs text-accent leading-relaxed">{step.desc}</p>
+                  {/* Label */}
+                  <div className="text-center w-full">
+                    <span className={`block text-xs font-bold uppercase tracking-wider mb-1 transition-colors ${isActive ? 'text-accent' : isPast ? 'text-primary' : 'text-taupe'}`}>
+                      Step {i + 1}
+                    </span>
+                    <span className={`block text-sm font-bold transition-colors ${isActive ? 'text-primary' : 'text-accent'}`}>
+                      {step.label}
+                    </span>
                   </div>
                 </button>
               );
@@ -610,44 +570,46 @@ export function PatientJourney() {
           </div>
         </div>
 
-        {/* Detail Card */}
-        <div className="rounded-3xl bg-white p-8 md:p-10 shadow-2xl">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="animate-bounce" style={{ animationDelay: '0s' }}>
-              <ZebraMascot size={32} />
+        {/* Modern Detail Card */}
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl border-2 border-taupe-20 transition-all duration-500 transform hover:border-accent/40">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+              <div className="flex-shrink-0">
+                {(() => {
+                  const Icon = JOURNEY_STEPS[activeStep].icon as any;
+                  return (
+                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-accent-10 flex items-center justify-center transform rotate-3">
+                      <Icon className="w-12 h-12 md:w-16 md:h-16 text-accent" />
+                    </div>
+                  );
+                })()}
+              </div>
+              <div className="text-center md:text-left flex-1">
+                <div className="inline-block px-4 py-1.5 bg-secondary/30 text-primary text-xs font-bold tracking-widest uppercase rounded-full mb-4">
+                  Phase {activeStep + 1}
+                </div>
+                <h4 className="text-2xl md:text-3xl font-black text-primary mb-4 leading-tight">
+                  {JOURNEY_STEPS[activeStep].label}
+                </h4>
+                <p className="text-accent text-lg leading-relaxed">
+                  {JOURNEY_STEPS[activeStep].desc}
+                </p>
+              </div>
             </div>
-            <div className="text-primary text-sm font-bold uppercase tracking-widest">Step {activeStep + 1} of {JOURNEY_STEPS.length}</div>
-            <div className="animate-bounce" style={{ animationDelay: '0.5s' }}>
-              <ZebraMascot size={32} className="scale-x-[-1]" />
-            </div>
-          </div>
-          <div className="flex items-center justify-center gap-3 mb-4">
-            {(() => {
-              const Icon = JOURNEY_STEPS[activeStep].icon as any;
-              return <Icon className="w-12 h-12" style={{ color: JOURNEY_STEPS[activeStep].pinColor }} />;
-            })()}
-            <h3 className="font-black text-3xl md:text-4xl text-center text-primary" style={{ fontFamily: "'Comic Neue', cursive, sans-serif" }}>{JOURNEY_STEPS[activeStep].label}</h3>
-          </div>
-          <p className="text-accent text-lg md:text-xl leading-relaxed max-w-3xl mx-auto text-center">{JOURNEY_STEPS[activeStep].desc}</p>
-          <div className="flex justify-center gap-3 mt-6">
-            {JOURNEY_STEPS.map((step, i) => {
-              const Icon = step.icon as any;
-              const isActive = i === activeStep;
-              return (
+            
+            {/* Quick Navigation */}
+            <div className="flex justify-center md:justify-start gap-2 mt-10 md:mt-8 md:ml-44">
+              {JOURNEY_STEPS.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveStep(i)}
-                  className={`w-12 h-12 rounded-full transition-all duration-300 flex items-center justify-center ${
-                    isActive 
-                      ? "scale-125 shadow-lg" 
-                      : "hover:scale-110"
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    i === activeStep ? 'w-10 bg-accent' : 'w-2 bg-taupe hover:bg-accent/50'
                   }`}
-                  style={{ backgroundColor: isActive ? step.pinColor : `${step.pinColor}30` }}
-                >
-                  <Icon className="w-6 h-6 text-white" />
-                </button>
-              );
-            })}
+                  aria-label={`Go to step ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
