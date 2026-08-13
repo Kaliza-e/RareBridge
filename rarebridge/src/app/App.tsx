@@ -41,7 +41,7 @@ export default function App() {
   const [view, setView] = useState<View>("home");
 
   const [selectedDisease, setSelectedDisease] =
-    useState<Disease | null>(null);
+    useState<string | null>(null);
 
   /*
    * Sound hooks
@@ -126,13 +126,7 @@ export default function App() {
    * Disease selection
    */
   function handleDisease(id: string) {
-    const disease = DISEASES.find((item) => item.id === id);
-
-    if (!disease) {
-      return;
-    }
-
-    setSelectedDisease(disease);
+    setSelectedDisease(id);
     setView("disease");
 
     window.scrollTo({
@@ -351,7 +345,7 @@ export default function App() {
 
         {view === "disease" && selectedDisease && (
           <DiseasePage
-            disease={selectedDisease}
+            diseaseId={selectedDisease}
             onBack={handleBackToDirectory}
           />
         )}

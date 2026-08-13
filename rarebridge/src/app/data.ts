@@ -3,12 +3,14 @@ import {
   BookOpen, Stethoscope, Microscope, Footprints, Star,
   FlaskConical, Baby, ClipboardList, Syringe, MessageCircle,AlertCircle, HandHeart, MapPin, Phone, Globe
 } from "lucide-react";
+import { apiService, Disease as ApiDisease } from "./services/api.service";
 
 export const NAV_LINKS = ["Home", "About","Explore Diseases", "Research", "Specialists", "Community" ];
 
 export const SUGGESTED_SEARCHES = ["Krabbe Disease", "Rett Syndrome", "Batten Disease", "Duchenne Muscular Dystrophy"];
 
-export const DISEASES = [
+// Fallback data for when API is not available
+const FALLBACK_DISEASES = [
   {
     id: "krabbe",
     name: "Krabbe Disease",
@@ -71,6 +73,68 @@ export const DISEASES = [
   { id: "batten", name: "Batten Disease", category: "Genetic · Neurological", categoryBadges: ["Genetic", "Neurological"], icon: Zap, color: "sapphire", shortDesc: "A fatal nervous system disorder that begins in childhood, causing vision loss, seizures, and progressive loss of motor and cognitive skills.", researchStatus: "Active Research", inheritance: "Autosomal Recessive", ageAppearance: "5–10 years", severity: "Severe", symptoms: ["Vision loss", "Seizures", "Cognitive decline", "Motor deterioration", "Behavioral changes"] },
   { id: "dmd", name: "Duchenne Muscular Dystrophy", category: "Genetic · Neurological", categoryBadges: ["Genetic", "Neurological"], icon: Activity, color: "taupe", shortDesc: "A severe form of muscular dystrophy caused by mutations in the DMD gene, affecting muscle fiber maintenance.", researchStatus: "Approved Treatment", inheritance: "X-Linked Recessive", ageAppearance: "2–5 years", severity: "Severe", symptoms: ["Progressive muscle weakness", "Difficulty walking", "Calf enlargement", "Cardiomyopathy", "Breathing difficulties"] }
 ];
+
+// Function to fetch diseases from API
+export async function fetchDiseasesFromAPI(search?: string, category?: string) {
+  try {
+    const apiDiseases = await apiService.getDiseases(search, category);
+    
+    // Transform API data to frontend format
+    const transformedDiseases = apiDiseases.map((apiDisease: ApiDisease) => ({
+      id: apiDisease.id,
+      name: apiDisease.name,
+      category: apiDisease.category,
+      categoryBadges: apiDisease.category.split(' · ').map(c => c.trim()),
+      icon: Brain, // Default icon, could be mapped based on category
+      color: "navy", // Default color, could be mapped based on category
+      shortDesc: apiDisease.overview.substring(0, 150) + '...',
+      researchStatus: "Active Research", // Could be added to API schema
+      inheritance: "Unknown", // Could be added to API schema
+      ageAppearance: "Unknown", // Could be added to API schema
+      severity: "Unknown", // Could be added to API schema
+      symptoms: [], // Could be parsed from typesAndSymptoms
+      overview: {
+        simple: apiDisease.overview,
+        medical: apiDisease.overview // Could be enhanced with separate medical overview
+      },
+      causes: {
+        genetic: apiDisease.causes,
+        environmental: "Unknown",
+        unknown: "Unknown"
+      },
+      types: [], // Could be parsed from typesAndSymptoms
+      diagnosis: [], // Could be parsed from diagnosis field
+      lifestyle: {
+        therapies: [],
+        nutrition: apiDisease.lifestyleAndDailySupport,
+        devices: [],
+        caregiverTips: []
+      },
+      research: [],
+      faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
+      myths: apiDisease.factsMyths?.map(fm => ({ 
+        myth: fm.statement, 
+        fact: fm.isFact ? fm.explanation : "False: " + fm.explanation 
+      })) || [],
+      specialists: apiDisease.specialists?.map(spec => ({
+        name: spec.name,
+        role: spec.focus,
+        org: spec.organization,
+        location: spec.location,
+        specialization: spec.focus,
+        publications: 0
+      })) || []
+    }));
+    
+    return transformedDiseases;
+  } catch (error) {
+    console.error('Failed to fetch diseases from API, using fallback data:', error);
+    return FALLBACK_DISEASES;
+  }
+}
+
+// Export DISEASES as a function that can be called with API data
+export const DISEASES = FALLBACK_DISEASES;
 
 export const CATEGORY_FILTERS = ["All", "Genetic", "Neurological", "Metabolic", "Autoimmune"];
 export const STATUS_FILTERS = ["All Status", "Active Research", "Approved Treatment", "Support Available"];

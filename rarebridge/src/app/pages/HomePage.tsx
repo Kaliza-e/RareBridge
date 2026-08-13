@@ -576,7 +576,6 @@ export default function HomePage({
                 border-primary
                 text-primary
                 font-bold
-                hover:bg-primary
                 hover:text-ivory
                 hover:scale-105
                 hover:shadow-lg
@@ -914,7 +913,6 @@ export default function HomePage({
                         mb-5
                         transition-all
                         duration-300
-                        group-hover:bg-[#112250]
                         group-hover:border-[#112250]
                       "
                     >

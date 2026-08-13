@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Disease {
+  id          String   @id @default(cuid())
+  diseaseNumber String  @unique
+  name        String
+  category    String
+  overview    String
+  causes      String
+  typesAndSymptoms String
+  diagnosis   String
+  lifestyleAndDailySupport String
+  treatmentsAndPharma String
+  
+  // Relations
+  faqs        FAQ[]
+  factsMyths  FactMyth[]
+  specialists Specialist[]
+  sources     Source[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FAQ {
+  id          String   @id @default(cuid())
+  diseaseId   String
+  question    String
+  answer      String
+  order       Int
+  
+  disease     Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FactMyth {
+  id          String   @id @default(cuid())
+  diseaseId   String
+  statement   String
+  isFact      Boolean
+  explanation String
+  order       Int
+  
+  disease     Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Specialist {
+  id          String   @id @default(cuid())
+  diseaseId   String
+  name        String
+  organization String
+  location    String
+  contact     String?
+  focus       String
+  why         String
+  
+  disease     Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Source {
+  id          String   @id @default(cuid())
+  diseaseId   String
+  title       String
+  url         String?
+  type        String
+  description String?
+  
+  disease     Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

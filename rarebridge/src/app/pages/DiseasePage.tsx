@@ -1,15 +1,101 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, Bot, Upload, Send, CheckCircle, AlertCircle, Dna, FlaskConical, Baby, Activity, Shield, BookOpen, Globe, Phone, MapPin, FileText, Star } from "lucide-react";
 import { ZebraEmptyState, Accordion, ZebraMascot } from "../components/common/Visuals";
+import { apiService } from "../services/api.service";
 import type { Disease } from "../data";
 
-export default function DiseasePage({ disease, onBack }: { disease: Disease; onBack: () => void }) {
+export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; onBack: () => void }) {
+  const [disease, setDisease] = useState<Disease | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState(0);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiInput, setAiInput] = useState("");
-  const [aiMessages, setAiMessages] = useState<{ role: "user" | "ai"; text: string }[]>([
-    { role: "ai", text: "Hello! I'm RareBridge AI. I can help you understand research papers and complex medical information about " + disease.name + ". Ask me anything, or upload a research paper to get started." }
-  ]);
+  const [aiMessages, setAiMessages] = useState<{ role: "user" | "ai"; text: string }[]>([]);
+
+  useEffect(() => {
+    async function loadDisease() {
+      setLoading(true);
+      try {
+        const apiDisease = await apiService.getDiseaseById(diseaseId);
+        // Transform API disease to frontend format
+        const transformedDisease: Disease = {
+          id: apiDisease.id,
+          name: apiDisease.name,
+          category: apiDisease.category,
+          categoryBadges: apiDisease.category.split(' · ').map(c => c.trim()),
+          icon: Dna,
+          color: "navy",
+          shortDesc: apiDisease.overview.substring(0, 150) + '...',
+          researchStatus: "Active Research",
+          inheritance: "Unknown",
+          ageAppearance: "Unknown",
+          severity: "Unknown",
+          symptoms: [],
+          overview: {
+            simple: apiDisease.overview,
+            medical: apiDisease.overview
+          },
+          causes: {
+            genetic: apiDisease.causes,
+            environmental: "Unknown",
+            unknown: "Unknown"
+          },
+          types: [],
+          diagnosis: [],
+          lifestyle: {
+            therapies: [],
+            nutrition: apiDisease.lifestyleAndDailySupport,
+            devices: [],
+            caregiverTips: []
+          },
+          research: [],
+          faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
+          myths: apiDisease.factsMyths?.map(fm => ({ 
+            myth: fm.statement, 
+            fact: fm.isFact ? fm.explanation : "False: " + fm.explanation 
+          })) || [],
+          specialists: apiDisease.specialists?.map(spec => ({
+            name: spec.name,
+            role: spec.focus,
+            org: spec.organization,
+            location: spec.location,
+            specialization: spec.focus,
+            publications: 0
+          })) || []
+        };
+        setDisease(transformedDisease);
+        setAiMessages([{ role: "ai", text: "Hello! I'm RareBridge AI. I can help you understand research papers and complex medical information about " + transformedDisease.name + ". Ask me anything, or upload a research paper to get started." }]);
+      } catch (error) {
+        console.error('Failed to load disease:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDisease();
+  }, [diseaseId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-primary">Loading disease information...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!disease) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-primary">Failed to load disease information</p>
+          <button onClick={onBack} className="mt-4 px-4 py-2 bg-primary text-ivory rounded-lg">Go Back</button>
+        </div>
+      </div>
+    );
+  }
 
   function sendAI() {
     if (!aiInput.trim()) return;

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, SlidersHorizontal, X, BookOpen } from "lucide-react";
-import { DISEASES, CATEGORY_FILTERS, STATUS_FILTERS } from "../data";
+import { DISEASES, CATEGORY_FILTERS, STATUS_FILTERS, fetchDiseasesFromAPI } from "../data";
 import { ZebraEmptyState, DiseaseCard, ButterflyDoodle, EdelweissFlower } from "../components/common/Visuals";
 
 export default function DirectoryPage({ onDisease }: { onDisease: (id: string) => void }) {
@@ -8,8 +8,26 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
   const [cat, setCat] = useState("All");
   const [status, setStatus] = useState("All Status");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [diseases, setDiseases] = useState(DISEASES);
+  const [loading, setLoading] = useState(false);
 
-  const filtered = DISEASES.filter(d => {
+  useEffect(() => {
+    async function loadDiseases() {
+      setLoading(true);
+      try {
+        const apiDiseases = await fetchDiseasesFromAPI(query, cat === "All" ? undefined : cat);
+        setDiseases(apiDiseases);
+      } catch (error) {
+        console.error('Failed to load diseases:', error);
+        setDiseases(DISEASES);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDiseases();
+  }, [query, cat]);
+
+  const filtered = diseases.filter(d => {
     const q = query.toLowerCase();
     const matchQ = !q || d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q);
     const matchC = cat === "All" || d.categoryBadges?.includes(cat);
