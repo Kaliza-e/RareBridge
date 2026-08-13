@@ -3,8 +3,6 @@
 Bridging the gap between rare diseases, knowledge, families, and care.
 
 
-
-
 🌉 About RareBridge
 
 RareBridge is a digital platform designed to help individuals and families better understand rare diseases through accessible, structured, and trustworthy health information.
