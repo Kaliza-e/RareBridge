@@ -31,6 +31,7 @@ let GoogleSheetsService = class GoogleSheetsService {
                 throw new Error('No data found in spreadsheet');
             }
             const headers = rows[0];
+            console.log('Google Sheets headers:', headers);
             const dataRows = rows.slice(1);
             const diseases = dataRows.map((row) => {
                 const disease = {};

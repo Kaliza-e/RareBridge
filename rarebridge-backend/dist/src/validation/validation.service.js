@@ -12,51 +12,122 @@ let ValidationService = class ValidationService {
     validateDiseaseData(data) {
         const errors = [];
         const sanitized = {};
-        const requiredFields = [
+        const coreRequiredFields = [
             'diseaseNumber',
             'name',
             'category',
-            'overview',
+            'overview'
+        ];
+        const optionalFields = [
             'causes',
             'typesAndSymptoms',
             'diagnosis',
             'lifestyleAndDailySupport',
             'treatmentsAndPharma'
         ];
-        for (const field of requiredFields) {
+        for (const field of coreRequiredFields) {
             if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
                 data[field] = String(data[field]);
             }
-            if (!data[field] || typeof data[field] !== 'string' || data[field].trim() === '') {
+            if (!data[field]) {
+                errors.push(`${field} is required and must be a non-empty string`);
+            }
+            else if (typeof data[field] !== 'string') {
+                errors.push(`${field} must be a string`);
+            }
+            else if (data[field].trim() === '') {
                 errors.push(`${field} is required and must be a non-empty string`);
             }
             else {
                 sanitized[field] = this.sanitizeString(data[field]);
             }
         }
-        if (data.faqs && Array.isArray(data.faqs)) {
-            sanitized.faqs = data.faqs.map((faq) => this.validateFaq(faq)).filter((f) => f.valid);
-            if (sanitized.faqs.length !== data.faqs.length) {
-                errors.push('Some FAQs were invalid and were filtered out');
+        for (const field of optionalFields) {
+            if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
+                data[field] = String(data[field]);
             }
+            if (!data[field] || typeof data[field] !== 'string' || data[field].trim() === '') {
+                const defaults = {
+                    causes: 'Information not available',
+                    typesAndSymptoms: 'Information not available',
+                    diagnosis: 'Information not available',
+                    lifestyleAndDailySupport: 'Information not available',
+                    treatmentsAndPharma: 'Information not available'
+                };
+                sanitized[field] = defaults[field];
+                console.warn(`${field} is missing, using default value for disease:`, data.name);
+            }
+            else {
+                sanitized[field] = this.sanitizeString(data[field]);
+            }
+        }
+        const maxLengths = {
+            overview: 2000,
+            causes: 2000,
+            typesAndSymptoms: 3000,
+            diagnosis: 2000,
+            lifestyleAndDailySupport: 5000,
+            treatmentsAndPharma: 5000
+        };
+        for (const [field, maxLength] of Object.entries(maxLengths)) {
+            if (sanitized[field] && sanitized[field].length > maxLength) {
+                console.warn(`${field} exceeds ${maxLength} characters, truncating`);
+                sanitized[field] = sanitized[field].substring(0, maxLength) + '...';
+            }
+        }
+        if (data.faqs && Array.isArray(data.faqs)) {
+            sanitized.faqs = data.faqs
+                .map((faq) => this.validateFaq(faq))
+                .filter((f) => f.valid)
+                .map((f) => f.data);
+            if (sanitized.faqs.length !== data.faqs.length) {
+                console.warn('Some FAQs were invalid and were filtered out');
+            }
+        }
+        else {
+            sanitized.faqs = [];
         }
         if (data.factsMyths && Array.isArray(data.factsMyths)) {
-            sanitized.factsMyths = data.factsMyths.map((fm) => this.validateFactMyth(fm)).filter((f) => f.valid);
+            sanitized.factsMyths = data.factsMyths
+                .map((fm) => this.validateFactMyth(fm))
+                .filter((f) => f.valid)
+                .map((f) => f.data);
             if (sanitized.factsMyths.length !== data.factsMyths.length) {
-                errors.push('Some facts/myths were invalid and were filtered out');
+                console.warn('Some facts/myths were invalid and were filtered out');
             }
+        }
+        else {
+            sanitized.factsMyths = [];
         }
         if (data.specialists && Array.isArray(data.specialists)) {
-            sanitized.specialists = data.specialists.map((spec) => this.validateSpecialist(spec)).filter((s) => s.valid);
+            sanitized.specialists = data.specialists
+                .map((spec) => this.validateSpecialist(spec))
+                .filter((s) => s.valid)
+                .map((s) => s.data);
             if (sanitized.specialists.length !== data.specialists.length) {
-                errors.push('Some specialists were invalid and were filtered out');
+                console.warn('Some specialists were invalid and were filtered out');
             }
         }
+        else {
+            sanitized.specialists = [];
+        }
         if (data.sources && Array.isArray(data.sources)) {
-            sanitized.sources = data.sources.map((source) => this.validateSource(source)).filter((s) => s.valid);
+            sanitized.sources = data.sources
+                .map((source) => this.validateSource(source))
+                .filter((s) => s.valid)
+                .map((s) => s.data);
             if (sanitized.sources.length !== data.sources.length) {
-                errors.push('Some sources were invalid and were filtered out');
+                console.warn('Some sources were invalid and were filtered out');
             }
+        }
+        else {
+            sanitized.sources = [];
+        }
+        if (errors.length > 0) {
+            console.error('Validation errors for disease:', data.name, errors);
+        }
+        else {
+            console.log('Validation passed for disease:', data.name);
         }
         return {
             valid: errors.length === 0,
@@ -137,41 +208,41 @@ let ValidationService = class ValidationService {
             .replace(/\s+/g, ' ');
     }
     transformGoogleSheetsData(rawData) {
+        console.log('Transforming raw data, first row:', rawData[0]);
         return rawData.map(row => {
-            const transformed = {};
-            Object.keys(row).forEach(key => {
-                const normalizedKey = key.toLowerCase().trim();
-                const fieldMap = {
-                    'disease no.': 'diseaseNumber',
-                    'disease no': 'diseaseNumber',
-                    'disease number': 'diseaseNumber',
-                    'disease name': 'name',
-                    'name': 'name',
-                    'category': 'category',
-                    'overview': 'overview',
-                    'causes': 'causes',
-                    'types and symptoms': 'typesAndSymptoms',
-                    'diagnosis': 'diagnosis',
-                    'lifestyle and daily support + community': 'lifestyleAndDailySupport',
-                    'lifestyle and daily support': 'lifestyleAndDailySupport',
-                    'research and pharma directory': 'treatmentsAndPharma',
-                    'treatments and pharma': 'treatmentsAndPharma',
-                    'faqs': 'faqs',
-                    'faqs for a disease': 'faqs',
-                    'facts vs. myths': 'factsMyths',
-                    'facts vs myths': 'factsMyths',
-                    'speacislist directory': 'specialists',
-                    'specialist directory': 'specialists',
-                    'sources': 'sources'
-                };
-                const mappedKey = fieldMap[normalizedKey] || normalizedKey;
-                transformed[mappedKey] = row[key];
-            });
-            if (transformed.diseaseNumber !== undefined && transformed.diseaseNumber !== null) {
+            const transformed = { ...row };
+            if (transformed.diseaseNumber !== undefined &&
+                transformed.diseaseNumber !== null) {
                 transformed.diseaseNumber = String(transformed.diseaseNumber).trim();
             }
+            const stringFields = [
+                'name',
+                'category',
+                'overview',
+                'causes',
+                'typesAndSymptoms',
+                'diagnosis',
+                'lifestyleAndDailySupport',
+                'treatmentsAndPharma',
+            ];
+            for (const field of stringFields) {
+                if (transformed[field] !== undefined &&
+                    transformed[field] !== null) {
+                    transformed[field] = String(transformed[field]).trim();
+                }
+            }
+            if (transformed.diagnosis) {
+                transformed.diagnosis = this.parseDiagnosisField(transformed.diagnosis);
+            }
+            if (transformed.lifestyleAndDailySupport) {
+                transformed.lifestyleAndDailySupport = this.parseLifestyleField(transformed.lifestyleAndDailySupport);
+            }
+            if (transformed.treatmentsAndPharma) {
+                transformed.treatmentsAndPharma = this.parseResearchField(transformed.treatmentsAndPharma);
+            }
             ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
-                if (transformed[field] && typeof transformed[field] === 'string') {
+                if (transformed[field] &&
+                    typeof transformed[field] === 'string') {
                     try {
                         transformed[field] = JSON.parse(transformed[field]);
                     }
@@ -180,8 +251,50 @@ let ValidationService = class ValidationService {
                     }
                 }
             });
+            console.log('Transformed row:', transformed);
             return transformed;
         });
+    }
+    parseDiagnosisField(diagnosisText) {
+        const lines = diagnosisText.split('•').map(line => line.trim());
+        const firstLine = lines[0] || diagnosisText;
+        if (firstLine.length > 500) {
+            return firstLine.substring(0, 500) + '...';
+        }
+        return firstLine;
+    }
+    parseLifestyleField(lifestyleText) {
+        const sections = lifestyleText.split(/\n\n|\r\n\r\n/);
+        const priorityKeywords = ['Therapies', 'Diets', 'Nutrition', 'Daily Care', 'Tips'];
+        let relevantSections = [];
+        for (const section of sections) {
+            for (const keyword of priorityKeywords) {
+                if (section.toLowerCase().includes(keyword.toLowerCase())) {
+                    relevantSections.push(section.trim());
+                    break;
+                }
+            }
+        }
+        if (relevantSections.length === 0 && sections.length > 0) {
+            return sections[0].trim().substring(0, 1000);
+        }
+        const combined = relevantSections.join('\n\n');
+        return combined.length > 1500 ? combined.substring(0, 1500) + '...' : combined;
+    }
+    parseResearchField(researchText) {
+        const lines = researchText.split(/\n/);
+        let organizations = [];
+        for (const line of lines) {
+            if (line.includes('•') || line.match(/^\d+\./)) {
+                organizations.push(line.trim());
+            }
+        }
+        if (organizations.length === 0) {
+            const paragraphs = researchText.split(/\n\n/);
+            return paragraphs[0]?.trim().substring(0, 800) || researchText.substring(0, 800);
+        }
+        const combined = organizations.join('\n');
+        return combined.length > 1000 ? combined.substring(0, 1000) + '...' : combined;
     }
 };
 exports.ValidationService = ValidationService;

@@ -89,10 +89,10 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
       color: "navy", // Default color, could be mapped based on category
       shortDesc: apiDisease.overview.substring(0, 150) + '...',
       researchStatus: "Active Research", // Could be added to API schema
-      inheritance: "Unknown", // Could be added to API schema
-      ageAppearance: "Unknown", // Could be added to API schema
-      severity: "Unknown", // Could be added to API schema
-      symptoms: [], // Could be parsed from typesAndSymptoms
+      inheritance: "Genetic", // Default for rare diseases
+      ageAppearance: "Variable", // Default for rare diseases
+      severity: "Severe", // Default for rare diseases
+      symptoms: apiDisease.typesAndSymptoms?.split('\n').filter(s => s.trim()) || [],
       overview: {
         simple: apiDisease.overview,
         medical: apiDisease.overview // Could be enhanced with separate medical overview
@@ -103,14 +103,24 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
         unknown: "Unknown"
       },
       types: [], // Could be parsed from typesAndSymptoms
-      diagnosis: [], // Could be parsed from diagnosis field
+      diagnosis: apiDisease.diagnosis ? [{
+        name: "Diagnostic Process",
+        what: "Clinical evaluation and testing",
+        how: "Comprehensive medical assessment",
+        result: apiDisease.diagnosis
+      }] : [],
       lifestyle: {
         therapies: [],
         nutrition: apiDisease.lifestyleAndDailySupport,
         devices: [],
         caregiverTips: []
       },
-      research: [],
+      research: apiDisease.treatmentsAndPharma ? [{
+        name: "Research & Pharma Directory",
+        focus: apiDisease.treatmentsAndPharma.substring(0, 100),
+        why: "Current research and treatment options",
+        logo: "RX"
+      }] : [],
       faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
       myths: apiDisease.factsMyths?.map(fm => ({ 
         myth: fm.statement, 

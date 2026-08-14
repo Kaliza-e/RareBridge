@@ -15,32 +15,44 @@ export class DiseaseController {
 
   @Post('import')
   async importFromSheets(@Body('spreadsheetId') spreadsheetId: string, @Body('range') range: string) {
-    const rawData = await this.googleSheetsService.importDiseases(spreadsheetId, range);
-    const transformedData = this.validationService.transformGoogleSheetsData(rawData);
-    const createdDiseases = [];
-    const failedImports = [];
-    
-    for (const disease of transformedData) {
-      const validation = this.validationService.validateDiseaseData(disease);
+    try {
+      console.log('Importing from Google Sheets:', { spreadsheetId, range });
+      const rawData = await this.googleSheetsService.importDiseases(spreadsheetId, range);
+      console.log('Raw data received:', rawData.length, 'rows');
       
-      if (validation.valid) {
-        try {
-          const created = await this.diseaseService.create(validation.sanitized);
-          createdDiseases.push(created);
-        } catch (error) {
-          failedImports.push({ disease: disease.name, error: String(error) });
+      const transformedData = this.validationService.transformGoogleSheetsData(rawData);
+      console.log('Transformed data:', transformedData.length, 'diseases');
+      
+      const createdDiseases = [];
+      const failedImports = [];
+      
+      for (const disease of transformedData) {
+        const validation = this.validationService.validateDiseaseData(disease);
+        
+        if (validation.valid) {
+          try {
+            const created = await this.diseaseService.create(validation.sanitized);
+            createdDiseases.push(created);
+          } catch (error) {
+            console.error('Failed to create disease:', disease.name, error);
+            failedImports.push({ disease: disease.name, error: String(error) });
+          }
+        } else {
+          console.error('Validation failed for disease:', disease.name, validation.errors);
+          failedImports.push({ disease: disease.name, errors: validation.errors });
         }
-      } else {
-        failedImports.push({ disease: disease.name, errors: validation.errors });
       }
+      
+      return { 
+        imported: createdDiseases.length, 
+        failed: failedImports.length,
+        diseases: createdDiseases,
+        errors: failedImports
+      };
+    } catch (error) {
+      console.error('Import failed:', error);
+      throw error;
     }
-    
-    return { 
-      imported: createdDiseases.length, 
-      failed: failedImports.length,
-      diseases: createdDiseases,
-      errors: failedImports
-    };
   }
 
   @Post()

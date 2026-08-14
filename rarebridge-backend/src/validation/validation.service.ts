@@ -6,12 +6,16 @@ export class ValidationService {
     const errors: string[] = [];
     const sanitized: any = {};
 
-    // Required fields validation
-    const requiredFields = [
+    // Core required fields (must have these)
+    const coreRequiredFields = [
       'diseaseNumber',
       'name',
       'category',
-      'overview',
+      'overview'
+    ];
+
+    // Optional fields with defaults (can be missing but better if present)
+    const optionalFields = [
       'causes',
       'typesAndSymptoms',
       'diagnosis',
@@ -19,45 +23,116 @@ export class ValidationService {
       'treatmentsAndPharma'
     ];
 
-    for (const field of requiredFields) {
-      // Coerce numbers to strings (e.g. diseaseNumber comes in as an integer from Google Sheets)
+    // Validate core required fields
+    for (const field of coreRequiredFields) {
       if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
         data[field] = String(data[field]);
       }
-      if (!data[field] || typeof data[field] !== 'string' || data[field].trim() === '') {
+      
+      if (!data[field]) {
+        errors.push(`${field} is required and must be a non-empty string`);
+      } else if (typeof data[field] !== 'string') {
+        errors.push(`${field} must be a string`);
+      } else if (data[field].trim() === '') {
         errors.push(`${field} is required and must be a non-empty string`);
       } else {
         sanitized[field] = this.sanitizeString(data[field]);
       }
     }
 
+    // Validate optional fields with defaults
+    for (const field of optionalFields) {
+      if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
+        data[field] = String(data[field]);
+      }
+      
+      if (!data[field] || typeof data[field] !== 'string' || data[field].trim() === '') {
+        // Use default values for missing optional fields
+        const defaults = {
+          causes: 'Information not available',
+          typesAndSymptoms: 'Information not available',
+          diagnosis: 'Information not available',
+          lifestyleAndDailySupport: 'Information not available',
+          treatmentsAndPharma: 'Information not available'
+        };
+        sanitized[field] = defaults[field];
+        console.warn(`${field} is missing, using default value for disease:`, data.name);
+      } else {
+        sanitized[field] = this.sanitizeString(data[field]);
+      }
+    }
+
+    // Validate field lengths to prevent excessively long content
+    const maxLengths = {
+      overview: 2000,
+      causes: 2000,
+      typesAndSymptoms: 3000,
+      diagnosis: 2000,
+      lifestyleAndDailySupport: 5000,
+      treatmentsAndPharma: 5000
+    };
+
+    for (const [field, maxLength] of Object.entries(maxLengths)) {
+      if (sanitized[field] && sanitized[field].length > maxLength) {
+        console.warn(`${field} exceeds ${maxLength} characters, truncating`);
+        sanitized[field] = sanitized[field].substring(0, maxLength) + '...';
+      }
+    }
+
     // Validate nested arrays
     if (data.faqs && Array.isArray(data.faqs)) {
-      sanitized.faqs = data.faqs.map((faq: any) => this.validateFaq(faq)).filter((f: any) => f.valid);
+      sanitized.faqs = data.faqs
+        .map((faq: any) => this.validateFaq(faq))
+        .filter((f: any) => f.valid)
+        .map((f: any) => f.data);
       if (sanitized.faqs.length !== data.faqs.length) {
-        errors.push('Some FAQs were invalid and were filtered out');
+        console.warn('Some FAQs were invalid and were filtered out');
       }
+    } else {
+      sanitized.faqs = [];
     }
 
     if (data.factsMyths && Array.isArray(data.factsMyths)) {
-      sanitized.factsMyths = data.factsMyths.map((fm: any) => this.validateFactMyth(fm)).filter((f: any) => f.valid);
+      sanitized.factsMyths = data.factsMyths
+        .map((fm: any) => this.validateFactMyth(fm))
+        .filter((f: any) => f.valid)
+        .map((f: any) => f.data);
       if (sanitized.factsMyths.length !== data.factsMyths.length) {
-        errors.push('Some facts/myths were invalid and were filtered out');
+        console.warn('Some facts/myths were invalid and were filtered out');
       }
+    } else {
+      sanitized.factsMyths = [];
     }
 
     if (data.specialists && Array.isArray(data.specialists)) {
-      sanitized.specialists = data.specialists.map((spec: any) => this.validateSpecialist(spec)).filter((s: any) => s.valid);
+      sanitized.specialists = data.specialists
+        .map((spec: any) => this.validateSpecialist(spec))
+        .filter((s: any) => s.valid)
+        .map((s: any) => s.data);
       if (sanitized.specialists.length !== data.specialists.length) {
-        errors.push('Some specialists were invalid and were filtered out');
+        console.warn('Some specialists were invalid and were filtered out');
       }
+    } else {
+      sanitized.specialists = [];
     }
 
     if (data.sources && Array.isArray(data.sources)) {
-      sanitized.sources = data.sources.map((source: any) => this.validateSource(source)).filter((s: any) => s.valid);
+      sanitized.sources = data.sources
+        .map((source: any) => this.validateSource(source))
+        .filter((s: any) => s.valid)
+        .map((s: any) => s.data);
       if (sanitized.sources.length !== data.sources.length) {
-        errors.push('Some sources were invalid and were filtered out');
+        console.warn('Some sources were invalid and were filtered out');
       }
+    } else {
+      sanitized.sources = [];
+    }
+
+    // Log validation results for debugging
+    if (errors.length > 0) {
+      console.error('Validation errors for disease:', data.name, errors);
+    } else {
+      console.log('Validation passed for disease:', data.name);
     }
 
     return {
@@ -144,58 +219,138 @@ export class ValidationService {
   }
 
   transformGoogleSheetsData(rawData: any[]): any[] {
+    console.log('Transforming raw data, first row:', rawData[0]);
     return rawData.map(row => {
-      const transformed: any = {};
-      
-      // Map Google Sheets column headers to our schema
-      Object.keys(row).forEach(key => {
-        const normalizedKey = key.toLowerCase().trim();
-        const fieldMap: { [key: string]: string } = {
-          'disease no.': 'diseaseNumber',
-          'disease no': 'diseaseNumber',       // also handle without period
-          'disease number': 'diseaseNumber',   // legacy fallback
-          'disease name': 'name',
-          'name': 'name',                      // legacy fallback
-          'category': 'category',
-          'overview': 'overview',
-          'causes': 'causes',
-          'types and symptoms': 'typesAndSymptoms',
-          'diagnosis': 'diagnosis',
-          'lifestyle and daily support + community': 'lifestyleAndDailySupport',
-          'lifestyle and daily support': 'lifestyleAndDailySupport', // legacy fallback
-          'research and pharma directory': 'treatmentsAndPharma',
-          'treatments and pharma': 'treatmentsAndPharma',            // legacy fallback
-          'faqs': 'faqs',
-          'faqs for a disease': 'faqs',        // legacy fallback
-          'facts vs. myths': 'factsMyths',
-          'facts vs myths': 'factsMyths',      // legacy fallback (no period)
-          'speacislist directory': 'specialists', // spreadsheet typo
-          'specialist directory': 'specialists', // correct spelling fallback
-          'sources': 'sources'
-        };
+      const transformed: any = { ...row };
 
-        const mappedKey = fieldMap[normalizedKey] || normalizedKey;
-        transformed[mappedKey] = row[key];
-      });
-
-      // Coerce diseaseNumber to string (Google Sheets sends it as an integer)
-      if (transformed.diseaseNumber !== undefined && transformed.diseaseNumber !== null) {
+      // Google Sheets may return diseaseNumber as a number
+      if (
+        transformed.diseaseNumber !== undefined &&
+        transformed.diseaseNumber !== null
+      ) {
         transformed.diseaseNumber = String(transformed.diseaseNumber).trim();
       }
 
-      // Parse nested JSON data if present; fall back to empty array for plain text
+      // Normalize required string fields
+      const stringFields = [
+        'name',
+        'category',
+        'overview',
+        'causes',
+        'typesAndSymptoms',
+        'diagnosis',
+        'lifestyleAndDailySupport',
+        'treatmentsAndPharma',
+      ];
+
+      for (const field of stringFields) {
+        if (
+          transformed[field] !== undefined &&
+          transformed[field] !== null
+        ) {
+          transformed[field] = String(transformed[field]).trim();
+        }
+      }
+
+      // Parse diagnosis field to extract structured procedures
+      if (transformed.diagnosis) {
+        transformed.diagnosis = this.parseDiagnosisField(transformed.diagnosis);
+      }
+
+      // Parse lifestyle field to extract structured sections
+      if (transformed.lifestyleAndDailySupport) {
+        transformed.lifestyleAndDailySupport = this.parseLifestyleField(transformed.lifestyleAndDailySupport);
+      }
+
+      // Parse research field to extract structured organizations
+      if (transformed.treatmentsAndPharma) {
+        transformed.treatmentsAndPharma = this.parseResearchField(transformed.treatmentsAndPharma);
+      }
+
+      // Parse nested JSON data if present
       ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
-        if (transformed[field] && typeof transformed[field] === 'string') {
+        if (
+          transformed[field] &&
+          typeof transformed[field] === 'string'
+        ) {
           try {
             transformed[field] = JSON.parse(transformed[field]);
           } catch {
-            // Spreadsheet stores these as plain text, not JSON — treat as empty array
+            // If the spreadsheet contains plain text instead of JSON,
+            // don't fail the entire disease import.
             transformed[field] = [];
           }
         }
       });
 
+      console.log('Transformed row:', transformed);
+
       return transformed;
     });
+  }
+
+  private parseDiagnosisField(diagnosisText: string): string {
+    // Extract the first meaningful description from disorganized diagnosis text
+    // Remove the detailed procedure breakdowns and keep a concise description
+    const lines = diagnosisText.split('•').map(line => line.trim());
+    const firstLine = lines[0] || diagnosisText;
+    
+    // If the text is very long, truncate it to a reasonable summary
+    if (firstLine.length > 500) {
+      return firstLine.substring(0, 500) + '...';
+    }
+    
+    return firstLine;
+  }
+
+  private parseLifestyleField(lifestyleText: string): string {
+    // Extract key sections from disorganized lifestyle text
+    // Focus on the most important information
+    const sections = lifestyleText.split(/\n\n|\r\n\r\n/);
+    
+    // Prioritize: Therapies, Nutrition, Daily Care
+    const priorityKeywords = ['Therapies', 'Diets', 'Nutrition', 'Daily Care', 'Tips'];
+    let relevantSections = [];
+    
+    for (const section of sections) {
+      for (const keyword of priorityKeywords) {
+        if (section.toLowerCase().includes(keyword.toLowerCase())) {
+          relevantSections.push(section.trim());
+          break;
+        }
+      }
+    }
+    
+    // If no priority sections found, return first section
+    if (relevantSections.length === 0 && sections.length > 0) {
+      return sections[0].trim().substring(0, 1000);
+    }
+    
+    // Combine relevant sections with reasonable length limit
+    const combined = relevantSections.join('\n\n');
+    return combined.length > 1500 ? combined.substring(0, 1500) + '...' : combined;
+  }
+
+  private parseResearchField(researchText: string): string {
+    // Extract organization names and focus areas from disorganized research text
+    const lines = researchText.split(/\n/);
+    let organizations = [];
+    
+    for (const line of lines) {
+      // Look for lines that seem to contain organization info
+      if (line.includes('•') || line.match(/^\d+\./)) {
+        organizations.push(line.trim());
+      }
+    }
+    
+    // If no structured lines found, return first meaningful paragraph
+    if (organizations.length === 0) {
+      const paragraphs = researchText.split(/\n\n/);
+      return paragraphs[0]?.trim().substring(0, 800) || researchText.substring(0, 800);
+    }
+    
+    // Combine organization info
+    const combined = organizations.join('\n');
+    return combined.length > 1000 ? combined.substring(0, 1000) + '...' : combined;
   }
 }

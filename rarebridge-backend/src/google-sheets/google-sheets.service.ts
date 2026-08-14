@@ -27,6 +27,7 @@ export class GoogleSheetsService {
 
       // Assuming first row contains headers
       const headers = rows[0];
+      console.log('Google Sheets headers:', headers);
       const dataRows = rows.slice(1);
 
       // Map Google Sheets columns to our data structure

@@ -27,10 +27,10 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
           color: "navy",
           shortDesc: apiDisease.overview.substring(0, 150) + '...',
           researchStatus: "Active Research",
-          inheritance: "Unknown",
-          ageAppearance: "Unknown",
-          severity: "Unknown",
-          symptoms: [],
+          inheritance: "Genetic",
+          ageAppearance: "Variable",
+          severity: "Severe",
+          symptoms: apiDisease.typesAndSymptoms?.split('\n').filter(s => s.trim()) || [],
           overview: {
             simple: apiDisease.overview,
             medical: apiDisease.overview
@@ -41,14 +41,24 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
             unknown: "Unknown"
           },
           types: [],
-          diagnosis: [],
+          diagnosis: apiDisease.diagnosis ? [{
+            name: "Diagnostic Process",
+            what: "Clinical evaluation and testing",
+            how: "Comprehensive medical assessment",
+            result: apiDisease.diagnosis
+          }] : [],
           lifestyle: {
             therapies: [],
             nutrition: apiDisease.lifestyleAndDailySupport,
             devices: [],
             caregiverTips: []
           },
-          research: [],
+          research: apiDisease.treatmentsAndPharma ? [{
+            name: "Research & Pharma Directory",
+            focus: apiDisease.treatmentsAndPharma.substring(0, 100),
+            why: "Current research and treatment options",
+            logo: "RX"
+          }] : [],
           faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
           myths: apiDisease.factsMyths?.map(fm => ({ 
             myth: fm.statement, 
@@ -170,10 +180,128 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
         </div>
       )}
 
-      {activeSection === 3 && (disease as any).diagnosis && (
+      {activeSection === 1 && (disease as any).causes && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+              <FlaskConical className="w-4 h-4 text-secondary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">Causes</h2>
+          </div>
+          <p className="text-accent leading-relaxed">{(disease as any).causes.genetic}</p>
+        </div>
+      )}
+
+      {activeSection === 2 && (disease as any).symptoms && (disease as any).symptoms.length > 0 && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center">
+              <Activity className="w-4 h-4 text-secondary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">Symptoms</h2>
+          </div>
+          <ul className="space-y-2">
+            {(disease as any).symptoms.map((symptom: string, i: number) => (
+              <li key={i} className="flex items-start gap-2 text-accent">
+                <span className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0" />
+                <span>{symptom}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {activeSection === 3 && (disease as any).diagnosis && (disease as any).diagnosis.length > 0 && (
         <div>
           <div className="bg-secondary rounded-2xl p-4 mb-6 flex items-start gap-3"><Shield className="w-5 h-5 text-primary mt-0.5 shrink-0" /><p className="text-sm text-primary font-medium">These diagnostic methods are used by specialists. Always consult a qualified healthcare professional for diagnosis.</p></div>
           <Accordion items={(disease as any).diagnosis.map((d: any) => ({ title: d.name, content: (<div className="space-y-4"><div><p className="text-xs font-bold text-taupe uppercase tracking-wider mb-1">What it is</p><p className="text-primary">{d.what}</p></div><div><p className="text-xs font-bold text-taupe uppercase tracking-wider mb-1">How it works</p><p className="text-primary">{d.how}</p></div><div><p className="text-xs font-bold text-taupe uppercase tracking-wider mb-1">What the result means</p><p className="text-primary bg-secondary rounded-xl p-3">{d.result}</p></div></div>) }))} />
+        </div>
+      )}
+
+      {activeSection === 4 && (disease as any).lifestyle && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center">
+              <Shield className="w-4 h-4 text-primary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">Lifestyle & Daily Support</h2>
+          </div>
+          <p className="text-accent leading-relaxed">{(disease as any).lifestyle.nutrition}</p>
+        </div>
+      )}
+
+      {activeSection === 5 && (disease as any).research && (disease as any).research.length > 0 && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+              <Star className="w-4 h-4 text-secondary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">Research & Pharma Directory</h2>
+          </div>
+          <div className="space-y-4">
+            {(disease as any).research.map((r: any, i: number) => (
+              <div key={i} className="border border-taupe-40 rounded-xl p-4">
+                <h3 className="font-bold text-primary mb-2">{r.name}</h3>
+                <p className="text-sm text-accent mb-2">{r.focus}</p>
+                <p className="text-xs text-taupe">{r.why}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeSection === 6 && (disease as any).faqs && (disease as any).faqs.length > 0 && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center">
+              <BookOpen className="w-4 h-4 text-secondary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">FAQs</h2>
+          </div>
+          <Accordion items={(disease as any).faqs.map((faq: any) => ({ title: faq.q, content: <p className="text-accent leading-relaxed">{faq.a}</p> }))} />
+        </div>
+      )}
+
+      {activeSection === 7 && (disease as any).myths && (disease as any).myths.length > 0 && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+              <AlertCircle className="w-4 h-4 text-secondary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">Facts vs Myths</h2>
+          </div>
+          <div className="space-y-4">
+            {(disease as any).myths.map((m: any, i: number) => (
+              <div key={i} className="border border-taupe-40 rounded-xl p-4">
+                <p className="font-bold text-primary mb-2">Myth: {m.myth}</p>
+                <p className="text-sm text-accent">{m.fact}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeSection === 8 && (disease as any).specialists && (disease as any).specialists.length > 0 && (
+        <div className="bg-white rounded-3xl border border-taupe-40 p-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center">
+              <Globe className="w-4 h-4 text-primary" />
+            </div>
+            <h2 className="font-black text-lg text-primary">Specialists</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {(disease as any).specialists.map((spec: any, i: number) => (
+              <div key={i} className="border border-taupe-40 rounded-xl p-4">
+                <h3 className="font-bold text-primary mb-1">{spec.name}</h3>
+                <p className="text-sm text-accent mb-1">{spec.role}</p>
+                <p className="text-xs text-taupe mb-1">{spec.org}</p>
+                <div className="flex items-center gap-1 text-xs text-taupe">
+                  <MapPin className="w-3 h-3" />
+                  <span>{spec.location}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

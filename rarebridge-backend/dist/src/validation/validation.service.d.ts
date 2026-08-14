@@ -10,4 +10,7 @@ export declare class ValidationService {
     private validateSource;
     private sanitizeString;
     transformGoogleSheetsData(rawData: any[]): any[];
+    private parseDiagnosisField;
+    private parseLifestyleField;
+    private parseResearchField;
 }
