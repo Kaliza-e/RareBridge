@@ -20,6 +20,10 @@ export class ValidationService {
     ];
 
     for (const field of requiredFields) {
+      // Coerce numbers to strings (e.g. diseaseNumber comes in as an integer from Google Sheets)
+      if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
+        data[field] = String(data[field]);
+      }
       if (!data[field] || typeof data[field] !== 'string' || data[field].trim() === '') {
         errors.push(`${field} is required and must be a non-empty string`);
       } else {
@@ -147,18 +151,26 @@ export class ValidationService {
       Object.keys(row).forEach(key => {
         const normalizedKey = key.toLowerCase().trim();
         const fieldMap: { [key: string]: string } = {
-          'disease number': 'diseaseNumber',
-          'name': 'name',
+          'disease no.': 'diseaseNumber',
+          'disease no': 'diseaseNumber',       // also handle without period
+          'disease number': 'diseaseNumber',   // legacy fallback
+          'disease name': 'name',
+          'name': 'name',                      // legacy fallback
           'category': 'category',
           'overview': 'overview',
           'causes': 'causes',
           'types and symptoms': 'typesAndSymptoms',
           'diagnosis': 'diagnosis',
-          'lifestyle and daily support': 'lifestyleAndDailySupport',
-          'treatments and pharma': 'treatmentsAndPharma',
-          'faqs for a disease': 'faqs',
-          'facts vs myths': 'factsMyths',
-          'specialist directory': 'specialists',
+          'lifestyle and daily support + community': 'lifestyleAndDailySupport',
+          'lifestyle and daily support': 'lifestyleAndDailySupport', // legacy fallback
+          'research and pharma directory': 'treatmentsAndPharma',
+          'treatments and pharma': 'treatmentsAndPharma',            // legacy fallback
+          'faqs': 'faqs',
+          'faqs for a disease': 'faqs',        // legacy fallback
+          'facts vs. myths': 'factsMyths',
+          'facts vs myths': 'factsMyths',      // legacy fallback (no period)
+          'speacislist directory': 'specialists', // spreadsheet typo
+          'specialist directory': 'specialists', // correct spelling fallback
           'sources': 'sources'
         };
 
@@ -166,13 +178,18 @@ export class ValidationService {
         transformed[mappedKey] = row[key];
       });
 
-      // Parse nested JSON data if present
+      // Coerce diseaseNumber to string (Google Sheets sends it as an integer)
+      if (transformed.diseaseNumber !== undefined && transformed.diseaseNumber !== null) {
+        transformed.diseaseNumber = String(transformed.diseaseNumber).trim();
+      }
+
+      // Parse nested JSON data if present; fall back to empty array for plain text
       ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
         if (transformed[field] && typeof transformed[field] === 'string') {
           try {
             transformed[field] = JSON.parse(transformed[field]);
           } catch {
-            // If parsing fails, keep as string or set to empty array
+            // Spreadsheet stores these as plain text, not JSON — treat as empty array
             transformed[field] = [];
           }
         }

@@ -49,17 +49,25 @@ let GoogleSheetsService = class GoogleSheetsService {
     }
     mapHeaderToField(header) {
         const headerMap = {
+            'disease no.': 'diseaseNumber',
+            'disease no': 'diseaseNumber',
             'disease number': 'diseaseNumber',
+            'disease name': 'name',
             'name': 'name',
             'category': 'category',
             'overview': 'overview',
             'causes': 'causes',
             'types and symptoms': 'typesAndSymptoms',
             'diagnosis': 'diagnosis',
+            'lifestyle and daily support + community': 'lifestyleAndDailySupport',
             'lifestyle and daily support': 'lifestyleAndDailySupport',
+            'research and pharma directory': 'treatmentsAndPharma',
             'treatments and pharma': 'treatmentsAndPharma',
+            'faqs': 'faqs',
             'faqs for a disease': 'faqs',
+            'facts vs. myths': 'factsMyths',
             'facts vs myths': 'factsMyths',
+            'speacislist directory': 'specialists',
             'specialist directory': 'specialists',
             'sources': 'sources',
         };

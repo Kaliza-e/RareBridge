@@ -10,7 +10,7 @@ async function bootstrap() {
         whitelist: true,
         transform: true,
     }));
-    await app.listen(3001);
+    await app.listen(3000);
     console.log('🚀 RareBridge API is running on http://localhost:3000');
 }
 bootstrap();

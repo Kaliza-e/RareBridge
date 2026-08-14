@@ -24,6 +24,9 @@ let ValidationService = class ValidationService {
             'treatmentsAndPharma'
         ];
         for (const field of requiredFields) {
+            if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
+                data[field] = String(data[field]);
+            }
             if (!data[field] || typeof data[field] !== 'string' || data[field].trim() === '') {
                 errors.push(`${field} is required and must be a non-empty string`);
             }
@@ -139,23 +142,34 @@ let ValidationService = class ValidationService {
             Object.keys(row).forEach(key => {
                 const normalizedKey = key.toLowerCase().trim();
                 const fieldMap = {
+                    'disease no.': 'diseaseNumber',
+                    'disease no': 'diseaseNumber',
                     'disease number': 'diseaseNumber',
+                    'disease name': 'name',
                     'name': 'name',
                     'category': 'category',
                     'overview': 'overview',
                     'causes': 'causes',
                     'types and symptoms': 'typesAndSymptoms',
                     'diagnosis': 'diagnosis',
+                    'lifestyle and daily support + community': 'lifestyleAndDailySupport',
                     'lifestyle and daily support': 'lifestyleAndDailySupport',
+                    'research and pharma directory': 'treatmentsAndPharma',
                     'treatments and pharma': 'treatmentsAndPharma',
+                    'faqs': 'faqs',
                     'faqs for a disease': 'faqs',
+                    'facts vs. myths': 'factsMyths',
                     'facts vs myths': 'factsMyths',
+                    'speacislist directory': 'specialists',
                     'specialist directory': 'specialists',
                     'sources': 'sources'
                 };
                 const mappedKey = fieldMap[normalizedKey] || normalizedKey;
                 transformed[mappedKey] = row[key];
             });
+            if (transformed.diseaseNumber !== undefined && transformed.diseaseNumber !== null) {
+                transformed.diseaseNumber = String(transformed.diseaseNumber).trim();
+            }
             ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
                 if (transformed[field] && typeof transformed[field] === 'string') {
                     try {

@@ -48,18 +48,26 @@ export class GoogleSheetsService {
 
   private mapHeaderToField(header: string): string {
     const headerMap: { [key: string]: string } = {
-      'disease number': 'diseaseNumber',
-      'name': 'name',
+      'disease no.': 'diseaseNumber',
+      'disease no': 'diseaseNumber',       // also handle without period
+      'disease number': 'diseaseNumber',   // legacy fallback
+      'disease name': 'name',
+      'name': 'name',                      // legacy fallback
       'category': 'category',
       'overview': 'overview',
       'causes': 'causes',
       'types and symptoms': 'typesAndSymptoms',
       'diagnosis': 'diagnosis',
-      'lifestyle and daily support': 'lifestyleAndDailySupport',
-      'treatments and pharma': 'treatmentsAndPharma',
-      'faqs for a disease': 'faqs',
-      'facts vs myths': 'factsMyths',
-      'specialist directory': 'specialists',
+      'lifestyle and daily support + community': 'lifestyleAndDailySupport',
+      'lifestyle and daily support': 'lifestyleAndDailySupport', // legacy fallback
+      'research and pharma directory': 'treatmentsAndPharma',
+      'treatments and pharma': 'treatmentsAndPharma',            // legacy fallback
+      'faqs': 'faqs',
+      'faqs for a disease': 'faqs',        // legacy fallback
+      'facts vs. myths': 'factsMyths',
+      'facts vs myths': 'factsMyths',      // legacy fallback (no period)
+      'speacislist directory': 'specialists', // spreadsheet typo
+      'specialist directory': 'specialists', // legacy fallback correct spelling
       'sources': 'sources',
     };
 
