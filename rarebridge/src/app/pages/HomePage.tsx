@@ -17,6 +17,7 @@ import {
   SUGGESTED_SEARCHES,
   STATS,
   FEATURES,
+  fetchDiseasesFromAPI,
   type Disease,
 } from "../data";
 
@@ -140,8 +141,33 @@ export default function HomePage({
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Disease[]>([]);
+  const [diseases, setDiseases] = useState<Disease[]>([]);
+  const [suggestedSearches, setSuggestedSearches] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [heroVisible, setHeroVisible] = useState(false);
+
+  /* -------------------------------------------------------
+     Fetch diseases from API on mount
+  ------------------------------------------------------- */
+
+  useEffect(() => {
+    async function loadDiseases() {
+      try {
+        const apiDiseases = await fetchDiseasesFromAPI();
+        setDiseases(apiDiseases);
+        // Set suggested searches from actual disease names
+        setSuggestedSearches(apiDiseases.slice(0, 4).map(d => d.name));
+      } catch (error) {
+        console.error('Failed to load diseases from API, using fallback:', error);
+        setDiseases(DISEASES);
+        setSuggestedSearches(SUGGESTED_SEARCHES);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDiseases();
+  }, []);
 
   /* -------------------------------------------------------
      Hero entrance animation
@@ -164,7 +190,7 @@ export default function HomePage({
 
     setResults(
       q.trim().length > 1
-        ? DISEASES.filter(
+        ? diseases.filter(
             (d) =>
               d.name
                 .toLowerCase()
@@ -499,7 +525,7 @@ export default function HomePage({
               Try:
             </span>
 
-            {SUGGESTED_SEARCHES.map((s, i) => (
+            {suggestedSearches.map((s, i) => (
               <button
                 key={s}
                 onClick={() => handleSearch(s)}
@@ -1030,13 +1056,26 @@ export default function HomePage({
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DISEASES.map((d) => (
-              <DiseaseCard
-                key={d.id}
-                disease={d}
-                onClick={() => onDisease(d.id)}
-              />
-            ))}
+            {loading ? (
+              <div className="col-span-full text-center py-12">
+                <div className="inline-flex items-center gap-2 text-taupe">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm font-medium">Loading diseases...</span>
+                </div>
+              </div>
+            ) : diseases.length > 0 ? (
+              diseases.map((d) => (
+                <DiseaseCard
+                  key={d.id}
+                  disease={d}
+                  onClick={() => onDisease(d.id)}
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-taupe font-medium">No diseases available</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
