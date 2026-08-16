@@ -49,30 +49,90 @@ export class GoogleSheetsService {
 
   private mapHeaderToField(header: string): string {
     const headerMap: { [key: string]: string } = {
+      // Disease No.
       'disease no.': 'diseaseNumber',
-      'disease no': 'diseaseNumber',       // also handle without period
-      'disease number': 'diseaseNumber',   // legacy fallback
+      'disease no': 'diseaseNumber',
+      'disease number': 'diseaseNumber',
+      'disease #': 'diseaseNumber',
+      'no.': 'diseaseNumber',
+      'no': 'diseaseNumber',
+
+      // Disease name
       'disease name': 'name',
-      'name': 'name',                      // legacy fallback
+      'name': 'name',
+      'disease': 'name',
+
+      // Category
       'category': 'category',
+      'categories': 'category',
+
+      // Overview
       'overview': 'overview',
+      'description': 'overview',
+      'summary': 'overview',
+
+      // Causes
       'causes': 'causes',
+      'cause': 'causes',
+
+      // Types and symptoms
       'types and symptoms': 'typesAndSymptoms',
+      'types & symptoms': 'typesAndSymptoms',
+      'causes, types and symptoms': 'typesAndSymptoms',
+      'causes, types & symptoms': 'typesAndSymptoms',
+      'symptoms': 'typesAndSymptoms',
+      'types': 'typesAndSymptoms',
+
+      // Diagnosis
       'diagnosis': 'diagnosis',
+      'diagnostic': 'diagnosis',
+      'diagnostics': 'diagnosis',
+
+      // Lifestyle and daily support + community
+      'lifestyle and daily support+community': 'lifestyleAndDailySupport',
       'lifestyle and daily support + community': 'lifestyleAndDailySupport',
-      'lifestyle and daily support': 'lifestyleAndDailySupport', // legacy fallback
+      'lifestyle and daily support': 'lifestyleAndDailySupport',
+      'lifestyle & daily support + community': 'lifestyleAndDailySupport',
+      'lifestyle & daily support': 'lifestyleAndDailySupport',
+      'lifestyle': 'lifestyleAndDailySupport',
+
+      // Research and pharma directory
       'research and pharma directory': 'treatmentsAndPharma',
-      'treatments and pharma': 'treatmentsAndPharma',            // legacy fallback
+      'research & pharma directory': 'treatmentsAndPharma',
+      'research and pharma': 'treatmentsAndPharma',
+      'research & pharma': 'treatmentsAndPharma',
+      'treatments and pharma': 'treatmentsAndPharma',
+      'treatments and pharma directory': 'treatmentsAndPharma',
+      'research': 'treatmentsAndPharma',
+
+      // FAQs
       'faqs': 'faqs',
-      'faqs for a disease': 'faqs',        // legacy fallback
+      'faq': 'faqs',
+      'faqs for a disease': 'faqs',
+      'faq for a disease': 'faqs',
+
+      // Facts vs. Myths
       'facts vs. myths': 'factsMyths',
-      'facts vs myths': 'factsMyths',      // legacy fallback (no period)
-      'speacislist directory': 'specialists', // spreadsheet typo
-      'specialist directory': 'specialists', // legacy fallback correct spelling
+      'facts vs myths': 'factsMyths',
+      'fact vs. myth': 'factsMyths',
+      'fact vs myth': 'factsMyths',
+      'facts vs. myths.': 'factsMyths',
+      'facts and myths': 'factsMyths',
+
+      // Specialist directory
+      'specialist directory': 'specialists',
+      'specialists directory': 'specialists',
+      'specialist': 'specialists',
+      'specialists': 'specialists',
+      'speacislist directory': 'specialists', // typo fallback
+
+      // Sources
       'sources': 'sources',
+      'source': 'sources',
+      'source directory': 'sources',
     };
 
-    const normalizedHeader = header.toLowerCase().trim();
+    const normalizedHeader = header.toLowerCase().replace(/\s+/g, ' ').trim();
     return headerMap[normalizedHeader] || normalizedHeader;
   }
 

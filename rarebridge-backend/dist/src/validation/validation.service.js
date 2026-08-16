@@ -243,11 +243,30 @@ let ValidationService = class ValidationService {
             ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
                 if (transformed[field] &&
                     typeof transformed[field] === 'string') {
+                    const raw = transformed[field].trim();
+                    if (raw === '') {
+                        transformed[field] = [];
+                        return;
+                    }
                     try {
-                        transformed[field] = JSON.parse(transformed[field]);
+                        transformed[field] = JSON.parse(raw);
                     }
                     catch {
-                        transformed[field] = [];
+                        if (field === 'faqs') {
+                            transformed[field] = this.parsePlainTextFaqs(raw);
+                        }
+                        else if (field === 'factsMyths') {
+                            transformed[field] = this.parsePlainTextFactsMyths(raw);
+                        }
+                        else if (field === 'specialists') {
+                            transformed[field] = this.parsePlainTextSpecialists(raw);
+                        }
+                        else if (field === 'sources') {
+                            transformed[field] = this.parsePlainTextSources(raw);
+                        }
+                        else {
+                            transformed[field] = [];
+                        }
                     }
                 }
             });
@@ -255,46 +274,102 @@ let ValidationService = class ValidationService {
             return transformed;
         });
     }
-    parseDiagnosisField(diagnosisText) {
-        const lines = diagnosisText.split('•').map(line => line.trim());
-        const firstLine = lines[0] || diagnosisText;
-        if (firstLine.length > 500) {
-            return firstLine.substring(0, 500) + '...';
+    parsePlainTextFaqs(text) {
+        if (!text || typeof text !== 'string')
+            return [];
+        const faqs = [];
+        const blocks = text.split(/(?=(?:Q:|Question:|\b\d+\.))/i).filter(b => b.trim());
+        for (let i = 0; i < blocks.length; i++) {
+            const block = blocks[i].trim();
+            const parts = block.split(/(?:A:|Answer:|\r?\n)/i).map(p => p.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+                faqs.push({
+                    question: parts[0].replace(/^(?:Q:|Question:|\d+\.)\s*/i, '').trim(),
+                    answer: parts.slice(1).join(' ').trim(),
+                    order: i + 1,
+                });
+            }
+            else if (parts.length === 1 && parts[0].length > 10) {
+                faqs.push({
+                    question: parts[0].replace(/^(?:Q:|Question:|\d+\.)\s*/i, '').trim(),
+                    answer: 'Refer to specialist directory and community resources for detailed answers.',
+                    order: i + 1,
+                });
+            }
         }
-        return firstLine;
+        return faqs;
+    }
+    parsePlainTextFactsMyths(text) {
+        if (!text || typeof text !== 'string')
+            return [];
+        const items = [];
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const isMyth = /myth/i.test(line);
+            const isFact = /fact/i.test(line) && !isMyth;
+            const cleanStatement = line.replace(/^(?:Myth|Fact|Statement|\d+\.|\*|-)\s*[:\-]?\s*/i, '').trim();
+            if (cleanStatement) {
+                items.push({
+                    statement: cleanStatement,
+                    isFact: isFact,
+                    explanation: line,
+                    order: i + 1,
+                });
+            }
+        }
+        return items;
+    }
+    parsePlainTextSpecialists(text) {
+        if (!text || typeof text !== 'string')
+            return [];
+        const items = [];
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        for (const line of lines) {
+            const parts = line.split(/[•|\-,]/).map(p => p.trim()).filter(Boolean);
+            if (parts.length >= 1) {
+                items.push({
+                    name: parts[0].replace(/^Dr\.?\s*/i, 'Dr. ') || 'Specialist Clinic',
+                    organization: parts[1] || 'Medical Center / Research Institute',
+                    location: parts[2] || 'Global / Nationwide',
+                    contact: null,
+                    focus: parts[3] || 'Specialized Care',
+                    why: line,
+                });
+            }
+        }
+        return items;
+    }
+    parsePlainTextSources(text) {
+        if (!text || typeof text !== 'string')
+            return [];
+        const items = [];
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        for (const line of lines) {
+            const urlMatch = line.match(/(https?:\/\/[^\s]+)/i);
+            items.push({
+                title: line.replace(/(https?:\/\/[^\s]+)/gi, '').trim() || 'Medical Reference',
+                url: urlMatch ? urlMatch[0] : null,
+                type: 'Medical Reference',
+                description: line,
+            });
+        }
+        return items;
+    }
+    parseDiagnosisField(diagnosisText) {
+        if (!diagnosisText)
+            return '';
+        return diagnosisText.trim();
     }
     parseLifestyleField(lifestyleText) {
-        const sections = lifestyleText.split(/\n\n|\r\n\r\n/);
-        const priorityKeywords = ['Therapies', 'Diets', 'Nutrition', 'Daily Care', 'Tips'];
-        let relevantSections = [];
-        for (const section of sections) {
-            for (const keyword of priorityKeywords) {
-                if (section.toLowerCase().includes(keyword.toLowerCase())) {
-                    relevantSections.push(section.trim());
-                    break;
-                }
-            }
-        }
-        if (relevantSections.length === 0 && sections.length > 0) {
-            return sections[0].trim().substring(0, 1000);
-        }
-        const combined = relevantSections.join('\n\n');
-        return combined.length > 1500 ? combined.substring(0, 1500) + '...' : combined;
+        if (!lifestyleText)
+            return '';
+        return lifestyleText.trim();
     }
     parseResearchField(researchText) {
-        const lines = researchText.split(/\n/);
-        let organizations = [];
-        for (const line of lines) {
-            if (line.includes('•') || line.match(/^\d+\./)) {
-                organizations.push(line.trim());
-            }
-        }
-        if (organizations.length === 0) {
-            const paragraphs = researchText.split(/\n\n/);
-            return paragraphs[0]?.trim().substring(0, 800) || researchText.substring(0, 800);
-        }
-        const combined = organizations.join('\n');
-        return combined.length > 1000 ? combined.substring(0, 1000) + '...' : combined;
+        if (!researchText)
+            return '';
+        return researchText.trim();
     }
 };
 exports.ValidationService = ValidationService;

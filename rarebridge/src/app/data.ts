@@ -84,47 +84,47 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
       id: apiDisease.id,
       name: apiDisease.name,
       category: apiDisease.category,
-      categoryBadges: apiDisease.category.split(' · ').map(c => c.trim()),
-      icon: Brain, // Default icon, could be mapped based on category
-      color: "navy", // Default color, could be mapped based on category
-      shortDesc: apiDisease.overview.substring(0, 150) + '...',
-      researchStatus: "Active Research", // Could be added to API schema
-      inheritance: "Genetic", // Default for rare diseases
-      ageAppearance: "Variable", // Default for rare diseases
-      severity: "Severe", // Default for rare diseases
-      symptoms: apiDisease.typesAndSymptoms?.split('\n').filter(s => s.trim()) || [],
+      categoryBadges: apiDisease.category ? apiDisease.category.split(/[·,]/).map(c => c.trim()).filter(Boolean) : ["Rare Disease"],
+      icon: Brain,
+      color: "navy",
+      shortDesc: apiDisease.overview ? (apiDisease.overview.length > 180 ? apiDisease.overview.substring(0, 180) + '...' : apiDisease.overview) : 'Comprehensive rare disease details and support resources.',
+      researchStatus: "Active Research",
+      inheritance: "Genetic",
+      ageAppearance: "Variable",
+      severity: "Severe",
+      symptoms: apiDisease.typesAndSymptoms ? apiDisease.typesAndSymptoms.split(/\r?\n|•|,/).map(s => s.trim()).filter(Boolean) : [],
       overview: {
-        simple: apiDisease.overview,
-        medical: apiDisease.overview // Could be enhanced with separate medical overview
+        simple: apiDisease.overview || "Overview information being updated.",
+        medical: apiDisease.overview || "Medical overview being updated."
       },
       causes: {
-        genetic: apiDisease.causes,
+        genetic: apiDisease.causes || "Genetic & environmental cause information.",
         environmental: "Unknown",
         unknown: "Unknown"
       },
-      types: [], // Could be parsed from typesAndSymptoms
+      types: [],
       diagnosis: apiDisease.diagnosis ? [{
         name: "Diagnostic Process",
-        what: "Clinical evaluation and testing",
-        how: "Comprehensive medical assessment",
+        what: "Clinical evaluation, genetic tests, and diagnostic review",
+        how: "Comprehensive assessment by specialized medical teams",
         result: apiDisease.diagnosis
       }] : [],
       lifestyle: {
         therapies: [],
-        nutrition: apiDisease.lifestyleAndDailySupport,
+        nutrition: apiDisease.lifestyleAndDailySupport || "Lifestyle and daily management information.",
         devices: [],
         caregiverTips: []
       },
       research: apiDisease.treatmentsAndPharma ? [{
         name: "Research & Pharma Directory",
-        focus: apiDisease.treatmentsAndPharma.substring(0, 100),
-        why: "Current research and treatment options",
+        focus: apiDisease.treatmentsAndPharma,
+        why: "Current clinical research, pharmaceutical pipeline, and therapeutic programs",
         logo: "RX"
       }] : [],
       faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
       myths: apiDisease.factsMyths?.map(fm => ({ 
         myth: fm.statement, 
-        fact: fm.isFact ? fm.explanation : "False: " + fm.explanation 
+        fact: fm.isFact ? `[Fact] ${fm.explanation}` : `[Myth] ${fm.explanation}` 
       })) || [],
       specialists: apiDisease.specialists?.map(spec => ({
         name: spec.name,
