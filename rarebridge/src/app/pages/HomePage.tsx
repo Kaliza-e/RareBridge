@@ -23,7 +23,6 @@ import {
 
 import {
   ZebraMascot,
-  ZebraWithButterfly,
   ButterflyDoodle,
   EdelweissFlower,
   DiseaseCard,
@@ -293,12 +292,6 @@ export default function HomePage({
           <div className="absolute bottom-32 right-10 animate-float opacity-20" style={{ animationDelay: '0.5s' }}>
             <EdelweissFlower size={45} />
           </div>
-          <div className="absolute top-60 left-1/4 animate-float opacity-15" style={{ animationDelay: '1.5s' }}>
-            <ZebraMascot size={28} />
-          </div>
-          <div className="absolute bottom-60 right-1/4 animate-float opacity-15" style={{ animationDelay: '2.5s' }}>
-            <ZebraMascot size={24} className="scale-x-[-1]" />
-          </div>
 
           {/* Trust badge */}
 
@@ -330,19 +323,6 @@ export default function HomePage({
             Trusted by 120,000+ families worldwide
           </div>
 
-          {/* Zebra */}
-
-          <div
-            className={`mb-6 relative ${fadeUp(
-              "delay-[200ms]"
-            )}`}
-          >
-            <ZebraWithButterfly
-              size={140}
-              className="animate-float cursor-pointer"
-            />
-          </div>
-
           {/* Headline */}
 
           <AnimatedHeadline />
@@ -356,21 +336,14 @@ export default function HomePage({
           >
             <div
               className="animate-bounce"
-              style={{ animationDelay: "0s" }}
-            >
-              <ZebraMascot size={32} />
-            </div>
-
-            <div
-              className="animate-bounce"
-              style={{ animationDelay: "0.3s" }}
+              style={{ animationDelay: "0.2s" }}
             >
               <ButterflyDoodle size={32} />
             </div>
 
             <div
               className="animate-bounce"
-              style={{ animationDelay: "0.6s" }}
+              style={{ animationDelay: "0.5s" }}
             >
               <EdelweissFlower size={32} />
             </div>
@@ -726,26 +699,6 @@ export default function HomePage({
               <EdelweissFlower
                 size={45}
                 className="opacity-50"
-              />
-            </div>
-
-            <div
-              className="absolute top-60 left-1/4 animate-float"
-              style={{ animationDelay: "1.5s" }}
-            >
-              <ZebraMascot
-                size={28}
-                className="opacity-30"
-              />
-            </div>
-
-            <div
-              className="absolute bottom-60 right-1/4 animate-float"
-              style={{ animationDelay: "2.5s" }}
-            >
-              <ZebraMascot
-                size={24}
-                className="opacity-25 scale-x-[-1]"
               />
             </div>
           </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { X, Menu } from "lucide-react";
 
 import { NAV_LINKS } from "../../data";
-import { ZebraMascot } from "../common/Visuals";
 
 const NAV_MAP: Record<string, string> = {
   Home: "home",
@@ -67,44 +66,19 @@ export default function Navbar({
     >
       {/* Navbar container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[62px] gap-6">
+        <div className="flex items-center justify-between h-[72px] sm:h-[80px] gap-6">
           
           {/* Logo */}
           <button
             onClick={() => handleNavigation("home")}
-            className="flex items-center gap-2.5 group shrink-0"
+            className="flex items-center group shrink-0 py-1 transition-transform duration-200 hover:scale-[1.03]"
             aria-label="Go to RareBridge home"
           >
-            <div
-              className="
-                relative flex h-9 w-9
-                items-center justify-center
-                rounded-2xl
-                bg-primary
-                shadow-md
-                group-hover:shadow-lg
-                group-hover:scale-[1.07]
-                transition-all duration-200
-              "
-            >
-              <ZebraMascot size={23} />
-            </div>
-
-            <span
-              className="
-                font-black
-                text-[1.15rem]
-                text-primary
-                tracking-tight
-                leading-none
-                select-none
-              "
-              style={{
-                fontFamily: "'Comic Neue', cursive, sans-serif",
-              }}
-            >
-              Rare<span className="text-accent">Bridge</span>
-            </span>
+            <img
+              src="/logo.png"
+              alt="RareBridge - Learn, Connect, Find Hope"
+              className="h-14 sm:h-16 md:h-[68px] w-auto max-w-[240px] sm:max-w-[280px] object-contain drop-shadow-sm transition-all duration-200"
+            />
           </button>
 
           {/* Desktop navigation */}

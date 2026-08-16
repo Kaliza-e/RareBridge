@@ -1,5 +1,4 @@
 import React from "react";
-import { ZebraMascot } from "../common/Visuals";
 import { Shield, Heart } from "lucide-react";
 
 export default function Footer() {
@@ -8,11 +7,14 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-10 mb-10">
           <div>
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-secondary/20 flex items-center justify-center">
-                <ZebraMascot size={22} />
+            <div className="mb-4">
+              <div className="inline-block bg-white/95 rounded-2xl p-2 shadow-sm">
+                <img
+                  src="/logo.png"
+                  alt="RareBridge"
+                  className="h-16 w-auto object-contain"
+                />
               </div>
-              <span className="font-black text-ivory text-lg tracking-tight">RareBridge</span>
             </div>
             <p className="text-sm text-taupe leading-relaxed mb-5">Connecting families, researchers, and specialists with trusted rare disease information.</p>
             <div className="flex items-center gap-1.5 text-xs text-taupe">

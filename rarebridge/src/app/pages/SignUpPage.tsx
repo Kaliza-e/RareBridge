@@ -43,8 +43,8 @@ export default function SignUpPage({ onNav }: { onNav: (v: string) => void }) {
             className="inline-flex items-center gap-2 text-sm text-taupe hover:text-secondary transition-colors mb-14">
             <ArrowLeft className="w-4 h-4" /> Back to RareBridge
           </button>
-          <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center mb-7">
-            <ZebraMascot size={28} />
+          <div className="inline-block bg-white/95 rounded-2xl p-2 shadow-md mb-7">
+            <img src="/logo.png" alt="RareBridge" className="h-16 w-auto object-contain" />
           </div>
           <h2 className="font-black text-4xl text-ivory leading-[1.1] mb-5">
             Join 120,000+<br />families on<br />RareBridge
@@ -81,9 +81,12 @@ export default function SignUpPage({ onNav }: { onNav: (v: string) => void }) {
 
             {/* Header */}
             <div className="mb-7">
-              <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center mb-5">
-                <ZebraMascot size={24} />
-              </div>
+              <img
+                src="/logo.png"
+                alt="RareBridge"
+                className="h-16 w-auto object-contain mb-4 cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => onNav("home")}
+              />
               <h1 className="font-black text-2xl text-primary mb-1.5">Create your account</h1>
               <p className="text-sm text-accent">
                 Already have one?{" "}
