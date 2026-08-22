@@ -144,25 +144,24 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
         <path d="M90 100 Q60 150 90 200 T90 300 T90 400" stroke="var(--accent)" strokeWidth="2" fill="none" />
         <path d="M20 200 Q50 250 20 300 T20 400 T20 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
       </svg>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <button onClick={onBack} className="flex items-center gap-2 text-sm font-semibold text-accent hover:text-primary mb-8 group transition-colors"><ChevronDown className="w-4 h-4 rotate-90 group-hover:-translate-x-0.5 transition-transform" />Back to Directory</button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <button onClick={onBack} className="flex items-center gap-2 text-sm font-semibold text-accent hover:text-primary mb-4 group transition-colors"><ChevronDown className="w-4 h-4 rotate-90 group-hover:-translate-x-0.5 transition-transform" />Back to Directory</button>
 
-      <div className="bg-primary rounded-3xl p-8 md:p-12 mb-8 relative overflow-hidden">
-        <div className="absolute -bottom-6 right-6 opacity-8 pointer-events-none"><ZebraMascot size={140} className="opacity-10" /></div>
+      <div className="bg-primary rounded-3xl p-6 md:p-8 mb-6 relative overflow-hidden">
         <div className="relative">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-md"><Icon className="w-7 h-7 text-secondary" /></div>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-md"><Icon className="w-5 h-5 text-secondary" /></div>
             {(disease as any).categoryBadges?.map((b: string) => (<span key={b} className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent text-secondary">{b}</span>))}
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent-10 text-secondary`}>{(disease as any).researchStatus}</span>
           </div>
-          <h1 className="font-black text-4xl md:text-5xl text-ivory mb-2">{disease.name}</h1>
-          <p className="text-taupe max-w-2xl">{disease.shortDesc}</p>
+          <h1 className="font-black text-2xl md:text-3xl text-ivory mb-2">{disease.name}</h1>
+          <p className="text-taupe text-sm max-w-2xl">{disease.shortDesc}</p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
             {quickInfoCards.map(card => (
-              <div key={card.label} className="bg-primary-dark rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-1"><card.icon className="w-4 h-4 text-taupe" /><span className="text-xs text-taupe font-medium">{card.label}</span></div>
-                <div className="font-bold text-secondary text-sm">{card.value}</div>
+              <div key={card.label} className="bg-primary-dark rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-1"><card.icon className="w-3.5 h-3.5 text-taupe" /><span className="text-xs text-taupe font-medium">{card.label}</span></div>
+                <div className="font-bold text-secondary text-xs sm:text-sm">{card.value}</div>
               </div>
             ))}
           </div>

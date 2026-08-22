@@ -13,7 +13,13 @@ export class GoogleSheetsService {
     this.sheets = google.sheets({ version: 'v4', auth });
   }
 
-  async importDiseases(spreadsheetId: string, range: string) {
+  async importDiseases(
+    spreadsheetId: string = process.env.SPREADSHEET_ID || process.env.GOOGLE_SPREADSHEET_ID || '', 
+    range: string = process.env.SPREADSHEET_RANGE || process.env.GOOGLE_SPREADSHEET_RANGE || 'Disease Information!A:Z'
+  ) {
+    if (!spreadsheetId) {
+      throw new Error('Google Spreadsheet ID is not configured.');
+    }
     try {
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId,

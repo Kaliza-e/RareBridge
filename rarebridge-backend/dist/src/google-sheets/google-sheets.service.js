@@ -20,7 +20,10 @@ let GoogleSheetsService = class GoogleSheetsService {
         });
         this.sheets = google.sheets({ version: 'v4', auth });
     }
-    async importDiseases(spreadsheetId, range) {
+    async importDiseases(spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID || '', range = process.env.GOOGLE_SPREADSHEET_RANGE || 'Sheet1!A:Z') {
+        if (!spreadsheetId) {
+            throw new Error('Google Spreadsheet ID is not configured.');
+        }
         try {
             const response = await this.sheets.spreadsheets.values.get({
                 spreadsheetId,

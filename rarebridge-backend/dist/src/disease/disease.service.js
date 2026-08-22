@@ -11,179 +11,91 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiseaseService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
+const google_sheets_service_1 = require("../google-sheets/google-sheets.service");
+const validation_service_1 = require("../validation/validation.service");
 let DiseaseService = class DiseaseService {
-    constructor(prisma) {
-        this.prisma = prisma;
+    constructor(googleSheetsService, validationService) {
+        this.googleSheetsService = googleSheetsService;
+        this.validationService = validationService;
+        this.cachedDiseases = [];
+        this.lastFetchTime = 0;
+        this.CACHE_TTL_MS = 5 * 60 * 1000;
     }
-    async create(createDiseaseDto) {
-        const { faqs, factsMyths, specialists, sources, ...diseaseData } = createDiseaseDto;
-        return this.prisma.disease.create({
-            data: {
-                ...diseaseData,
-                faqs: faqs ? {
-                    create: faqs.map(faq => ({
-                        question: faq.question,
-                        answer: faq.answer,
-                        order: faq.order ?? 0,
-                    }))
-                } : undefined,
-                factsMyths: factsMyths ? {
-                    create: factsMyths.map(fm => ({
-                        statement: fm.statement,
-                        isFact: fm.isFact,
-                        explanation: fm.explanation,
-                        order: fm.order ?? 0,
-                    }))
-                } : undefined,
-                specialists: specialists ? {
-                    create: specialists.map(spec => ({
-                        name: spec.name,
-                        organization: spec.organization,
-                        location: spec.location,
-                        contact: spec.contact,
-                        focus: spec.focus,
-                        why: spec.why,
-                    }))
-                } : undefined,
-                sources: sources ? {
-                    create: sources.map(source => ({
-                        title: source.title,
-                        url: source.url,
-                        type: source.type,
-                        description: source.description,
-                    }))
-                } : undefined,
-            },
-            include: {
-                faqs: true,
-                factsMyths: true,
-                specialists: true,
-                sources: true,
-            },
-        });
+    async fetchAndCacheDiseases() {
+        const now = Date.now();
+        if (this.cachedDiseases.length > 0 && (now - this.lastFetchTime) < this.CACHE_TTL_MS) {
+            return this.cachedDiseases;
+        }
+        try {
+            console.log('Fetching diseases from Google Sheets...');
+            const rawData = await this.googleSheetsService.importDiseases();
+            const transformedData = this.validationService.transformGoogleSheetsData(rawData);
+            const validDiseases = [];
+            for (const disease of transformedData) {
+                const validation = this.validationService.validateDiseaseData(disease);
+                if (validation.valid) {
+                    validDiseases.push({
+                        id: validation.sanitized.diseaseNumber,
+                        ...validation.sanitized
+                    });
+                }
+                else {
+                    console.error('Validation failed for disease:', disease.name, validation.errors);
+                }
+            }
+            this.cachedDiseases = validDiseases;
+            this.lastFetchTime = now;
+            console.log(`Successfully cached ${validDiseases.length} diseases.`);
+            return this.cachedDiseases;
+        }
+        catch (error) {
+            console.error('Error fetching and caching diseases:', error);
+            if (this.cachedDiseases.length > 0) {
+                console.warn('Returning stale cache due to fetch error.');
+                return this.cachedDiseases;
+            }
+            throw error;
+        }
     }
     async findAll(search, category) {
-        const where = {};
+        let diseases = await this.fetchAndCacheDiseases();
         if (search) {
-            where.OR = [
-                { name: { contains: search, mode: 'insensitive' } },
-                { category: { contains: search, mode: 'insensitive' } },
-                { overview: { contains: search, mode: 'insensitive' } },
-            ];
+            const searchLower = search.toLowerCase();
+            diseases = diseases.filter(d => (d.name && d.name.toLowerCase().includes(searchLower)) ||
+                (d.category && d.category.toLowerCase().includes(searchLower)) ||
+                (d.overview && d.overview.toLowerCase().includes(searchLower)));
         }
         if (category) {
-            where.category = { equals: category, mode: 'insensitive' };
+            const catLower = category.toLowerCase();
+            diseases = diseases.filter(d => d.category && d.category.toLowerCase() === catLower);
         }
-        return this.prisma.disease.findMany({
-            where,
-            include: {
-                faqs: { orderBy: { order: 'asc' } },
-                factsMyths: { orderBy: { order: 'asc' } },
-                specialists: true,
-                sources: true,
-            },
-            orderBy: { name: 'asc' },
-        });
+        return diseases.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }
     async findOne(id) {
-        const disease = await this.prisma.disease.findUnique({
-            where: { id },
-            include: {
-                faqs: { orderBy: { order: 'asc' } },
-                factsMyths: { orderBy: { order: 'asc' } },
-                specialists: true,
-                sources: true,
-            },
-        });
+        const diseases = await this.fetchAndCacheDiseases();
+        const disease = diseases.find(d => d.id === id || d.diseaseNumber === id);
         if (!disease) {
-            throw new common_1.NotFoundException(`Disease with ID ${id} not found`);
+            throw new common_1.NotFoundException(`Disease with ID/Number ${id} not found`);
         }
         return disease;
     }
     async findByDiseaseNumber(diseaseNumber) {
-        const disease = await this.prisma.disease.findUnique({
-            where: { diseaseNumber },
-            include: {
-                faqs: { orderBy: { order: 'asc' } },
-                factsMyths: { orderBy: { order: 'asc' } },
-                specialists: true,
-                sources: true,
-            },
-        });
+        const diseases = await this.fetchAndCacheDiseases();
+        const disease = diseases.find(d => d.diseaseNumber === diseaseNumber);
         if (!disease) {
             throw new common_1.NotFoundException(`Disease with number ${diseaseNumber} not found`);
         }
         return disease;
     }
-    async update(id, updateDiseaseDto) {
-        const { faqs, factsMyths, specialists, sources, ...diseaseData } = updateDiseaseDto;
-        return this.prisma.disease.update({
-            where: { id },
-            data: {
-                ...diseaseData,
-                faqs: faqs ? {
-                    deleteMany: {},
-                    create: faqs.map(faq => ({
-                        question: faq.question,
-                        answer: faq.answer,
-                        order: faq.order ?? 0,
-                    }))
-                } : undefined,
-                factsMyths: factsMyths ? {
-                    deleteMany: {},
-                    create: factsMyths.map(fm => ({
-                        statement: fm.statement,
-                        isFact: fm.isFact,
-                        explanation: fm.explanation,
-                        order: fm.order ?? 0,
-                    }))
-                } : undefined,
-                specialists: specialists ? {
-                    deleteMany: {},
-                    create: specialists.map(spec => ({
-                        name: spec.name,
-                        organization: spec.organization,
-                        location: spec.location,
-                        contact: spec.contact,
-                        focus: spec.focus,
-                        why: spec.why,
-                    }))
-                } : undefined,
-                sources: sources ? {
-                    deleteMany: {},
-                    create: sources.map(source => ({
-                        title: source.title,
-                        url: source.url,
-                        type: source.type,
-                        description: source.description,
-                    }))
-                } : undefined,
-            },
-            include: {
-                faqs: true,
-                factsMyths: true,
-                specialists: true,
-                sources: true,
-            },
-        });
-    }
-    async remove(id) {
-        return this.prisma.disease.delete({
-            where: { id },
-        });
-    }
     async getCategories() {
-        const diseases = await this.prisma.disease.findMany({
-            select: { category: true },
-            distinct: ['category'],
-        });
-        return diseases.map(d => d.category).sort();
+        const diseases = await this.fetchAndCacheDiseases();
+        const categories = new Set(diseases.map(d => d.category).filter(Boolean));
+        return Array.from(categories).sort();
     }
 };
 exports.DiseaseService = DiseaseService;
 exports.DiseaseService = DiseaseService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [google_sheets_service_1.GoogleSheetsService, validation_service_1.ValidationService])
 ], DiseaseService);
 //# sourceMappingURL=disease.service.js.map

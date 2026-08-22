@@ -10,7 +10,6 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const disease_module_1 = require("./disease/disease.module");
-const prisma_module_1 = require("./prisma/prisma.module");
 const google_sheets_module_1 = require("./google-sheets/google-sheets.module");
 const validation_module_1 = require("./validation/validation.module");
 let AppModule = class AppModule {
@@ -22,7 +21,6 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
-            prisma_module_1.PrismaModule,
             disease_module_1.DiseaseModule,
             google_sheets_module_1.GoogleSheetsModule,
             validation_module_1.ValidationModule,

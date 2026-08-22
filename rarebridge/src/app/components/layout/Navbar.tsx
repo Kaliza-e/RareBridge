@@ -58,16 +58,15 @@ export default function Navbar({
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
           ? "bg-white/98 shadow-[0_1px_24px_0_rgba(0,0,0,0.07)]"
           : "bg-ivory/90"
-      } backdrop-blur-xl`}
+        } backdrop-blur-xl`}
     >
       {/* Navbar container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[72px] sm:h-[80px] gap-6">
-          
+
           {/* Logo */}
           <button
             onClick={() => handleNavigation("home")}
@@ -100,10 +99,9 @@ export default function Navbar({
                     duration-200
                     rounded-lg
 
-                    ${
-                      isActive
-                        ? "text-primary font-semibold"
-                        : "text-accent font-medium hover:text-primary hover:bg-secondary/60"
+                    ${isActive
+                      ? "text-primary font-semibold"
+                      : "text-accent font-medium hover:text-primary hover:bg-secondary/60"
                     }
                   `}
                 >
@@ -228,10 +226,9 @@ export default function Navbar({
                   transition-all
                   duration-150
 
-                  ${
-                    isActive
-                      ? "bg-primary/8 text-primary font-semibold border-l-2 border-primary pl-3.5"
-                      : "text-accent hover:bg-secondary/60 hover:text-primary"
+                  ${isActive
+                    ? "bg-primary/8 text-primary font-semibold border-l-2 border-primary pl-3.5"
+                    : "text-accent hover:bg-secondary/60 hover:text-primary"
                   }
                 `}
               >

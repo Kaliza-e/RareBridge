@@ -40,15 +40,23 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   /* RGB helpers for opacity utilities */
-  --primary-rgb: 17, 34, 80; /* #112250 */
+  --primary-rgb: 17, 34, 80;
+  /* #112250 */
   --primary-dark: #1a325e;
-  --primary-dark-rgb: 26, 50, 94; /* #1a325e */
-  --primary-darker-rgb: 27, 50, 94; /* #1b325e */
-  --primary-darkest-rgb: 29, 53, 96; /* #1d3560 */
-  --accent-rgb: 59, 80, 125; /* #3B507D */
-  --taupe-rgb: 190, 183, 167; /* #BEB7A7 */
-  --champagne-rgb: 231, 226, 206; /* #E7E2CE */
-  --ivory-rgb: 245, 244, 240; /* #F5F4F0 */
+  --primary-dark-rgb: 26, 50, 94;
+  /* #1a325e */
+  --primary-darker-rgb: 27, 50, 94;
+  /* #1b325e */
+  --primary-darkest-rgb: 29, 53, 96;
+  /* #1d3560 */
+  --accent-rgb: 59, 80, 125;
+  /* #3B507D */
+  --taupe-rgb: 190, 183, 167;
+  /* #BEB7A7 */
+  --champagne-rgb: 231, 226, 206;
+  /* #E7E2CE */
+  --ivory-rgb: 245, 244, 240;
+  /* #F5F4F0 */
 }
 
 /* -- Palette mappings for literal Tailwind arbitrary hex classes used in JSX
@@ -58,27 +66,35 @@
 .bg-\[\#112250\] {
   background-color: var(--primary) !important;
 }
+
 .bg-\[\#112250\]\/10 {
   background-color: rgba(var(--primary-rgb), 0.1) !important;
 }
+
 .bg-\[\#112250\]\/15 {
   background-color: rgba(var(--primary-rgb), 0.15) !important;
 }
+
 .text-\[\#112250\] {
   color: var(--primary) !important;
 }
+
 .border-\[\#112250\] {
   border-color: var(--primary) !important;
 }
+
 .shadow-\[\#112250\]\/30 {
   box-shadow: 0 10px 15px rgba(var(--primary-rgb), 0.3) !important;
 }
+
 .shadow-\[\#112250\]\/20 {
   box-shadow: 0 8px 10px rgba(var(--primary-rgb), 0.2) !important;
 }
+
 .text-\[\#F5F4F0\] {
   color: var(--primary-foreground) !important;
 }
+
 .bg-\[\#F5F4F0\] {
   background-color: var(--background) !important;
 }
@@ -86,12 +102,15 @@
 .bg-\[\#3B507D\] {
   background-color: var(--accent) !important;
 }
+
 .bg-\[\#3B507D\]\/10 {
   background-color: rgba(var(--accent-rgb), 0.1) !important;
 }
+
 .text-\[\#3B507D\] {
   color: var(--accent) !important;
 }
+
 .border-\[\#3B507D\] {
   border-color: var(--accent) !important;
 }
@@ -99,9 +118,11 @@
 .bg-\[\#E7E2CE\] {
   background-color: var(--secondary) !important;
 }
+
 .text-\[\#E7E2CE\] {
   color: var(--secondary) !important;
 }
+
 .border-\[\#E7E2CE\] {
   border-color: var(--secondary) !important;
 }
@@ -109,18 +130,23 @@
 .bg-\[\#BEB7A7\] {
   background-color: var(--switch-background) !important;
 }
+
 .bg-\[\#BEB7A7\]\/20 {
   background-color: rgba(var(--taupe-rgb), 0.2) !important;
 }
+
 .text-\[\#BEB7A7\] {
   color: rgb(var(--taupe-rgb)) !important;
 }
+
 .border-\[\#BEB7A7\]\/40 {
   border-color: rgba(var(--taupe-rgb), 0.4) !important;
 }
+
 .hover\:border-\[\#BEB7A7\]\/60:hover {
   border-color: rgba(var(--taupe-rgb), 0.6) !important;
 }
+
 .placeholder\:text-\[\#BEB7A7\]::placeholder {
   color: rgba(var(--taupe-rgb), 1) !important;
 }
@@ -133,12 +159,15 @@
 .hover\:bg-\[\#1a325e\]:hover {
   background-color: rgb(var(--primary-dark-rgb)) !important;
 }
+
 .hover\:bg-\[\#1b325e\]:hover {
   background-color: rgb(var(--primary-darker-rgb)) !important;
 }
+
 .hover\:bg-\[\#1d3560\]:hover {
   background-color: rgb(var(--primary-darkest-rgb)) !important;
 }
+
 .bg-\[\#1a325e\] {
   background-color: rgb(var(--primary-dark-rgb)) !important;
 }
@@ -152,36 +181,47 @@
 .bg-primary {
   background-color: var(--primary) !important;
 }
+
 .text-primary {
   color: var(--primary) !important;
 }
+
 .border-primary {
   border-color: var(--primary) !important;
 }
+
 .bg-primary-10 {
   background-color: rgba(var(--primary-rgb), 0.1) !important;
 }
+
 .bg-primary-15 {
   background-color: rgba(var(--primary-rgb), 0.15) !important;
 }
+
 .bg-primary-20 {
   background-color: rgba(var(--primary-rgb), 0.2) !important;
 }
+
 .bg-primary-30 {
   background-color: rgba(var(--primary-rgb), 0.3) !important;
 }
+
 .bg-primary-40 {
   background-color: rgba(var(--primary-rgb), 0.4) !important;
 }
+
 .shadow-primary-20 {
   box-shadow: 0 6px 12px rgba(var(--primary-rgb), 0.2) !important;
 }
+
 .hover\:bg-primary-dark:hover {
   background-color: rgb(var(--primary-dark-rgb)) !important;
 }
+
 .hover\:bg-primary-darker:hover {
   background-color: rgb(var(--primary-darker-rgb)) !important;
 }
+
 .hover\:bg-primary-darkest:hover {
   background-color: rgb(var(--primary-darkest-rgb)) !important;
 }
@@ -189,12 +229,15 @@
 .bg-accent {
   background-color: var(--accent) !important;
 }
+
 .text-accent {
   color: var(--accent) !important;
 }
+
 .border-accent {
   border-color: var(--accent) !important;
 }
+
 .bg-accent-10 {
   background-color: rgba(var(--accent-rgb), 0.1) !important;
 }
@@ -202,12 +245,15 @@
 .bg-secondary {
   background-color: var(--secondary) !important;
 }
+
 .text-secondary {
   color: var(--secondary) !important;
 }
+
 .border-secondary {
   border-color: var(--secondary) !important;
 }
+
 .bg-secondary-20 {
   background-color: rgba(var(--champagne-rgb), 0.2) !important;
 }
@@ -215,24 +261,31 @@
 .bg-taupe {
   background-color: var(--switch-background) !important;
 }
+
 .text-taupe {
   color: rgb(var(--taupe-rgb)) !important;
 }
+
 .border-taupe {
   border-color: rgba(var(--taupe-rgb), 1) !important;
 }
+
 .bg-taupe-20 {
   background-color: rgba(var(--taupe-rgb), 0.2) !important;
 }
+
 .bg-taupe-30 {
   background-color: rgba(var(--taupe-rgb), 0.3) !important;
 }
+
 .border-taupe-40 {
   border-color: rgba(var(--taupe-rgb), 0.4) !important;
 }
+
 .hover\:border-taupe-60:hover {
   border-color: rgba(var(--taupe-rgb), 0.6) !important;
 }
+
 .placeholder\:text-taupe::placeholder {
   color: rgba(var(--taupe-rgb), 1) !important;
 }
@@ -240,6 +293,7 @@
 .bg-ivory {
   background-color: var(--background) !important;
 }
+
 .text-ivory {
   color: var(--primary-foreground) !important;
 }
@@ -248,6 +302,7 @@
 .from-secondary {
   --tw-gradient-from: var(--secondary);
 }
+
 .to-taupe-30 {
   --tw-gradient-to: rgba(var(--taupe-rgb), 0.3);
 }

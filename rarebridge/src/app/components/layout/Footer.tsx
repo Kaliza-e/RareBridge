@@ -3,21 +3,21 @@ import { Shield, Heart } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="hidden md:block bg-primary pt-14 pb-8 px-4 sm:px-6 lg:px-8">
+    <footer className="hidden md:block bg-primary pt-6 pb-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-10 mb-10">
+        <div className="grid md:grid-cols-4 gap-6 mb-6">
           <div>
-            <div className="mb-4">
-              <div className="inline-block bg-white/95 rounded-2xl p-2 shadow-sm">
+            <div className="mb-2">
+              <div className="inline-block bg-white/95 rounded-xl p-1.5 shadow-sm">
                 <img
                   src="/logo.png"
                   alt="RareBridge"
-                  className="h-16 w-auto object-contain"
+                  className="h-10 w-auto object-contain"
                 />
               </div>
             </div>
-            <p className="text-sm text-taupe leading-relaxed mb-5">Connecting families, researchers, and specialists with trusted rare disease information.</p>
-            <div className="flex items-center gap-1.5 text-xs text-taupe">
+            <p className="text-xs text-taupe leading-relaxed mb-3">Connecting families, researchers, and specialists with trusted rare disease information.</p>
+            <div className="flex items-center gap-1.5 text-[11px] text-taupe">
               <Heart className="w-3 h-3 text-secondary" /> Made with care for rare disease families
             </div>
           </div>
@@ -27,20 +27,20 @@ export default function Footer() {
             { title: "Support", links: ["Help Center", "Contact Us", "Terms of Use", "Cookie Policy"] },
           ].map(col => (
             <div key={col.title}>
-              <h4 className="font-bold text-secondary text-xs uppercase tracking-widest mb-4">{col.title}</h4>
-              <ul className="space-y-2.5">
+              <h4 className="font-bold text-secondary text-[11px] uppercase tracking-widest mb-2.5">{col.title}</h4>
+              <ul className="space-y-1.5">
                 {col.links.map(l => (
                   <li key={l}>
-                    <a href="#" className="text-sm text-taupe hover:text-secondary transition-colors duration-200">{l}</a>
+                    <a href="#" className="text-xs text-taupe hover:text-secondary transition-colors duration-200">{l}</a>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-taupe">© 2026 RareBridge. For informational purposes only. Not medical advice.</p>
-          <div className="flex items-center gap-1.5 text-xs text-taupe">
+        <div className="border-t border-white/10 pt-3 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[11px] text-taupe">© 2026 RareBridge. For informational purposes only. Not medical advice.</p>
+          <div className="flex items-center gap-1.5 text-[11px] text-taupe">
             <Shield className="w-3 h-3 text-secondary" /> Medically reviewed content
           </div>
         </div>

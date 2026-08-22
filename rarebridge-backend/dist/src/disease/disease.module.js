@@ -10,7 +10,6 @@ exports.DiseaseModule = void 0;
 const common_1 = require("@nestjs/common");
 const disease_controller_1 = require("./disease.controller");
 const disease_service_1 = require("./disease.service");
-const prisma_module_1 = require("../prisma/prisma.module");
 const google_sheets_module_1 = require("../google-sheets/google-sheets.module");
 const validation_module_1 = require("../validation/validation.module");
 let DiseaseModule = class DiseaseModule {
@@ -18,7 +17,7 @@ let DiseaseModule = class DiseaseModule {
 exports.DiseaseModule = DiseaseModule;
 exports.DiseaseModule = DiseaseModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, google_sheets_module_1.GoogleSheetsModule, validation_module_1.ValidationModule],
+        imports: [google_sheets_module_1.GoogleSheetsModule, validation_module_1.ValidationModule],
         controllers: [disease_controller_1.DiseaseController],
         providers: [disease_service_1.DiseaseService],
     })

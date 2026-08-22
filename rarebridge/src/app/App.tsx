@@ -18,7 +18,6 @@ import {
   useChimeSound,
   useSparkleSound,
   AIAssistant,
-  FlyingZebra,
 } from "./components/common/Visuals";
 
 import SignInPage from "./pages/SignInPage";
@@ -304,7 +303,6 @@ export default function App() {
 
       {/* Decorative background */}
       <BackgroundParticles />
-      <FlyingZebra />
 
       {/* Navbar */}
       {view !== "signin" && view !== "signup" && (

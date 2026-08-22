@@ -99,32 +99,6 @@ class ApiService {
     return this.request<string[]>('/diseases/categories');
   }
 
-  async createDisease(disease: Partial<Disease>): Promise<Disease> {
-    return this.request<Disease>('/diseases', {
-      method: 'POST',
-      body: JSON.stringify(disease),
-    });
-  }
-
-  async updateDisease(id: string, disease: Partial<Disease>): Promise<Disease> {
-    return this.request<Disease>(`/diseases/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(disease),
-    });
-  }
-
-  async deleteDisease(id: string): Promise<void> {
-    return this.request<void>(`/diseases/${id}`, {
-      method: 'DELETE',
-    });
-  }
-
-  async importFromSheets(spreadsheetId: string, range: string): Promise<any> {
-    return this.request<any>('/diseases/import', {
-      method: 'POST',
-      body: JSON.stringify({ spreadsheetId, range }),
-    });
-  }
 }
 
 export const apiService = new ApiService();

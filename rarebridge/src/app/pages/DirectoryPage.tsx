@@ -62,34 +62,26 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
         <path d="M20 200 Q50 250 20 300 T20 400 T20 500" stroke="var(--secondary)" strokeWidth="2" fill="none" />
       </svg>
       {/* ── Page header ── */}
-      <div className="relative overflow-hidden bg-primary">
+      <div className="relative overflow-hidden bg-primary py-6 sm:py-8">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-secondary opacity-10 blur-[100px]" />
-          <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-accent opacity-5 blur-[80px]" />
-          {/* Floating doodles */}
-          <div className="absolute top-10 left-10 animate-float" style={{ animationDelay: '0s' }}>
-            <ButterflyDoodle size={35} className="opacity-30" />
-          </div>
-          <div className="absolute top-20 right-20 animate-float" style={{ animationDelay: '1.5s' }}>
-            <EdelweissFlower size={45} className="opacity-25" />
-          </div>
-          <div className="absolute bottom-10 left-1/4 animate-float" style={{ animationDelay: '0.8s' }}>
-            <ButterflyDoodle size={30} className="opacity-20" />
-          </div>
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-secondary opacity-10 blur-[80px]" />
+          <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-accent opacity-5 blur-[60px]" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-2xl bg-secondary/20 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-secondary" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-7 h-7 rounded-xl bg-secondary/20 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-secondary" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary/70">Disease Library</span>
             </div>
-            <span className="text-xs font-bold uppercase tracking-widest text-secondary/70">Disease Library</span>
+            <h1 className="font-black text-2xl md:text-3xl text-ivory tracking-tight">Explore Diseases</h1>
+            <p className="text-taupe text-sm max-w-xl mt-1">Browse our comprehensive library of rare conditions with plain-language explanations and expert-reviewed details.</p>
           </div>
-          <h1 className="font-black text-4xl md:text-5xl text-ivory mb-3 tracking-tight">Disease Directory</h1>
-          <p className="text-taupe text-lg max-w-xl">Browse our comprehensive library of rare conditions, each with plain-language explanations and expert-reviewed details.</p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         {/* ── Search + filter bar ── */}
         <div className="bg-white rounded-3xl border border-taupe-40/60 shadow-sm overflow-hidden mb-8">

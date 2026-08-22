@@ -57,10 +57,9 @@ function AnimatedHeadline() {
   }, []);
 
   const wordClass = (i: number) =>
-    `inline-block transition-all duration-500 ease-out ${
-      visible.includes(i)
-        ? "opacity-100 translate-y-0 blur-0"
-        : "opacity-0 translate-y-6 blur-sm"
+    `inline-block transition-all duration-500 ease-out ${visible.includes(i)
+      ? "opacity-100 translate-y-0 blur-0"
+      : "opacity-0 translate-y-6 blur-sm"
     }`;
 
   let idx = 0;
@@ -102,9 +101,8 @@ function AnimatedHeadline() {
         return (
           <span
             key={word}
-            className={`${wordClass(i)} mr-3 ${
-              wi === 0 ? "text-accent" : ""
-            }`}
+            className={`${wordClass(i)} mr-3 ${wi === 0 ? "text-accent" : ""
+              }`}
           >
             {word}
           </span>
@@ -190,14 +188,14 @@ export default function HomePage({
     setResults(
       q.trim().length > 1
         ? diseases.filter(
-            (d) =>
-              d.name
-                .toLowerCase()
-                .includes(q.toLowerCase()) ||
-              d.category
-                .toLowerCase()
-                .includes(q.toLowerCase())
-          )
+          (d) =>
+            d.name
+              .toLowerCase()
+              .includes(q.toLowerCase()) ||
+            d.category
+              .toLowerCase()
+              .includes(q.toLowerCase())
+        )
         : []
     );
   }
@@ -207,10 +205,9 @@ export default function HomePage({
   ------------------------------------------------------- */
 
   const fadeUp = (delay: string) =>
-    `transition-all duration-700 ${delay} ${
-      heroVisible
-        ? "opacity-100 translate-y-0"
-        : "opacity-0 translate-y-8"
+    `transition-all duration-700 ${delay} ${heroVisible
+      ? "opacity-100 translate-y-0"
+      : "opacity-0 translate-y-8"
     }`;
 
   /* -------------------------------------------------------
@@ -771,7 +768,7 @@ export default function HomePage({
         {/* Subtle glow effects */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           {/* Section heading */}
@@ -940,7 +937,7 @@ export default function HomePage({
         {/* Subtle glow effects */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div className="flex items-end justify-between mb-10">
@@ -1042,7 +1039,7 @@ export default function HomePage({
         <div className="absolute top-4 left-10 w-2 h-2 bg-primary rounded-full animate-ping opacity-30" />
         <div className="absolute top-8 right-16 w-1.5 h-1.5 bg-accent rounded-full animate-ping opacity-40" style={{ animationDelay: '0.5s' }} />
         <div className="absolute bottom-4 left-1/3 w-2 h-2 bg-secondary rounded-full animate-ping opacity-30" style={{ animationDelay: '1s' }} />
-        
+
         <div className="flex items-center justify-center gap-6 py-8 border-y border-[#E8ECF2] relative z-10">
 
           <div className="flex-1 h-px bg-gradient-to-r from-transparent to-[#D9E0EA]" />
@@ -1075,7 +1072,7 @@ export default function HomePage({
         <div className="absolute top-16 right-32 w-1.5 h-1.5 bg-accent rounded-full animate-ping opacity-30" style={{ animationDelay: '0.3s' }} />
         <div className="absolute bottom-20 left-1/4 w-2 h-2 bg-secondary rounded-full animate-ping opacity-20" style={{ animationDelay: '0.6s' }} />
         <div className="absolute bottom-32 right-16 w-1.5 h-1.5 bg-primary rounded-full animate-ping opacity-25" style={{ animationDelay: '0.9s' }} />
-        
+
         <div
           className="
             max-w-4xl
