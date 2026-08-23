@@ -65,7 +65,7 @@ export default function Navbar({
     >
       {/* Navbar container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[72px] sm:h-[80px] gap-6">
+        <div className="flex items-center justify-between h-[80px] sm:h-[90px] md:h-[100px] gap-6">
 
           {/* Logo */}
           <button
@@ -73,11 +73,12 @@ export default function Navbar({
             className="flex items-center group shrink-0 py-1 transition-transform duration-200 hover:scale-[1.03]"
             aria-label="Go to RareBridge home"
           >
-            <img
-              src="/logo.png"
-              alt="RareBridge - Learn, Connect, Find Hope"
-              className="h-14 sm:h-16 md:h-[68px] w-auto max-w-[240px] sm:max-w-[280px] object-contain drop-shadow-sm transition-all duration-200"
-            />
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                R
+              </div>
+              <span className="text-xl font-bold text-primary tracking-tight">RareBridge</span>
+            </div>
           </button>
 
           {/* Desktop navigation */}

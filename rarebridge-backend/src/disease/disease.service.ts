@@ -22,7 +22,10 @@ export class DiseaseService {
 
     console.log('Fetching diseases from Google Sheets...');
     const rawData = await this.googleSheetsService.importDiseases();
+    console.log(`Raw data fetched from Google Sheets: ${rawData.length} diseases`);
+    
     const transformedData = this.validationService.transformGoogleSheetsData(rawData);
+    console.log(`Transformed data: ${transformedData.length} diseases`);
     
     const validDiseases = [];
     for (const disease of transformedData) {
@@ -33,7 +36,7 @@ export class DiseaseService {
           ...validation.sanitized
         });
       } else {
-        console.error('Validation failed for disease:', disease.name, validation.errors);
+        console.error('Validation failed for disease:', disease.name || 'Unknown', validation.errors);
       }
     }
 

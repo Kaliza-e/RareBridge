@@ -32,8 +32,11 @@ export default function SignInPage({ onNav }: { onNav: (v: string) => void }) {
             className="inline-flex items-center gap-2 text-sm text-taupe hover:text-secondary transition-colors mb-14">
             <ArrowLeft className="w-4 h-4" /> Back to RareBridge
           </button>
-          <div className="inline-block bg-white/95 rounded-2xl p-2 shadow-md mb-7">
-            <img src="/logo.png" alt="RareBridge" className="h-16 w-auto object-contain" />
+          <div className="inline-flex items-center gap-2 bg-white/95 rounded-2xl p-3 shadow-md mb-7">
+            <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
+              R
+            </div>
+            <span className="text-lg font-bold text-primary tracking-tight pr-2">RareBridge</span>
           </div>
           <h2 className="font-black text-4xl text-ivory leading-[1.1] mb-5">
             Welcome back<br />to RareBridge
@@ -70,12 +73,15 @@ export default function SignInPage({ onNav }: { onNav: (v: string) => void }) {
 
             {/* Header */}
             <div className="mb-8">
-              <img
-                src="/logo.png"
-                alt="RareBridge"
-                className="h-16 w-auto object-contain mb-4 cursor-pointer hover:scale-105 transition-transform"
+              <div 
+                className="inline-flex items-center gap-2 mb-4 cursor-pointer hover:scale-105 transition-transform"
                 onClick={() => onNav("home")}
-              />
+              >
+                <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                  R
+                </div>
+                <span className="text-2xl font-bold text-primary tracking-tight">RareBridge</span>
+              </div>
               <h1 className="font-black text-2xl text-primary mb-1.5">Sign in</h1>
               <p className="text-sm text-accent">
                 No account?{" "}

@@ -1,33 +1,36 @@
 const API_BASE_URL = 'http://localhost:3000';
 
-export interface Disease {
-  id: string;
-  diseaseNumber: string;
+// ─── Structured Types (matching backend smart-parsed output) ──────────────────
+
+export interface DiagnosticStep {
   name: string;
-  category: string;
-  overview: string;
-  causes: string;
-  typesAndSymptoms: string;
-  diagnosis: string;
-  lifestyleAndDailySupport: string;
-  treatmentsAndPharma: string;
-  faqs?: FAQ[];
-  factsMyths?: FactMyth[];
-  specialists?: Specialist[];
-  sources?: Source[];
-  createdAt: string;
-  updatedAt: string;
+  what: string;
+  how: string;
+  result: string;
+}
+
+export interface LifestyleData {
+  therapies: string[];
+  nutrition: string;
+  devices: string[];
+  caregiverTips: string[];
+  community: string;
+  raw: string;
+}
+
+export interface ResearchOrg {
+  name: string;
+  focus: string;
+  url: string | null;
 }
 
 export interface FAQ {
-  id: string;
   question: string;
   answer: string;
   order: number;
 }
 
 export interface FactMyth {
-  id: string;
   statement: string;
   isFact: boolean;
   explanation: string;
@@ -35,27 +38,49 @@ export interface FactMyth {
 }
 
 export interface Specialist {
-  id: string;
   name: string;
   organization: string;
   location: string;
-  contact?: string;
+  contact?: string | null;
   focus: string;
   why: string;
 }
 
 export interface Source {
-  id: string;
   title: string;
-  url?: string;
+  url?: string | null;
   type: string;
-  description?: string;
+  description?: string | null;
 }
+
+export interface Disease {
+  id: string;
+  diseaseNumber: string;
+  name: string;
+  category: string;
+  overview: string;
+  causes: string;
+  /** Smart-parsed symptom list */
+  typesAndSymptoms: string[];
+  /** Smart-parsed diagnostic steps */
+  diagnosis: DiagnosticStep[];
+  /** Smart-parsed lifestyle data with sub-sections */
+  lifestyleAndDailySupport: LifestyleData;
+  /** Smart-parsed research orgs with links */
+  treatmentsAndPharma: ResearchOrg[];
+  faqs?: FAQ[];
+  factsMyths?: FactMyth[];
+  specialists?: Specialist[];
+  sources?: Source[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// ─── API Service ──────────────────────────────────────────────────────────────
 
 class ApiService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    
     try {
       const response = await fetch(url, {
         headers: {
@@ -80,10 +105,8 @@ class ApiService {
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     if (category) params.append('category', category);
-    
     const queryString = params.toString();
     const endpoint = `/diseases${queryString ? `?${queryString}` : ''}`;
-    
     return this.request<Disease[]>(endpoint);
   }
 
@@ -98,7 +121,6 @@ class ApiService {
   async getCategories(): Promise<string[]> {
     return this.request<string[]>('/diseases/categories');
   }
-
 }
 
 export const apiService = new ApiService();

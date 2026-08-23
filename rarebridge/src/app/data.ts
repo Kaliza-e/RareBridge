@@ -92,7 +92,11 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
       inheritance: "Genetic",
       ageAppearance: "Variable",
       severity: "Severe",
-      symptoms: apiDisease.typesAndSymptoms ? apiDisease.typesAndSymptoms.split(/\r?\n|•|,/).map(s => s.trim()).filter(Boolean) : [],
+      symptoms: apiDisease.typesAndSymptoms ? 
+        (Array.isArray(apiDisease.typesAndSymptoms) 
+          ? apiDisease.typesAndSymptoms 
+          : apiDisease.typesAndSymptoms.split(/\r?\n|•|,/).map(s => s.trim()).filter(Boolean)
+        ) : [],
       overview: {
         simple: apiDisease.overview || "Overview information being updated.",
         medical: apiDisease.overview || "Medical overview being updated."
@@ -103,24 +107,44 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
         unknown: "Unknown"
       },
       types: [],
-      diagnosis: apiDisease.diagnosis ? [{
-        name: "Diagnostic Process",
-        what: "Clinical evaluation, genetic tests, and diagnostic review",
-        how: "Comprehensive assessment by specialized medical teams",
-        result: apiDisease.diagnosis
-      }] : [],
-      lifestyle: {
-        therapies: [],
-        nutrition: apiDisease.lifestyleAndDailySupport || "Lifestyle and daily management information.",
-        devices: [],
-        caregiverTips: []
-      },
-      research: apiDisease.treatmentsAndPharma ? [{
-        name: "Research & Pharma Directory",
-        focus: apiDisease.treatmentsAndPharma,
-        why: "Current clinical research, pharmaceutical pipeline, and therapeutic programs",
-        logo: "RX"
-      }] : [],
+      diagnosis: apiDisease.diagnosis ? 
+        (Array.isArray(apiDisease.diagnosis) 
+          ? apiDisease.diagnosis 
+          : [{
+              name: "Diagnostic Process",
+              what: "Clinical evaluation, genetic tests, and diagnostic review",
+              how: "Comprehensive assessment by specialized medical teams",
+              result: apiDisease.diagnosis
+            }]
+        ) : [],
+      lifestyle: typeof apiDisease.lifestyleAndDailySupport === 'object' && apiDisease.lifestyleAndDailySupport !== null ?
+        {
+          therapies: apiDisease.lifestyleAndDailySupport.therapies || [],
+          nutrition: apiDisease.lifestyleAndDailySupport.nutrition || "Lifestyle and daily management information.",
+          devices: apiDisease.lifestyleAndDailySupport.devices || [],
+          caregiverTips: apiDisease.lifestyleAndDailySupport.caregiverTips || []
+        } :
+        {
+          therapies: [],
+          nutrition: apiDisease.lifestyleAndDailySupport || "Lifestyle and daily management information.",
+          devices: [],
+          caregiverTips: []
+        },
+      research: apiDisease.treatmentsAndPharma ? 
+        (Array.isArray(apiDisease.treatmentsAndPharma) 
+          ? apiDisease.treatmentsAndPharma.map(org => ({
+              name: org.name,
+              focus: org.focus,
+              why: org.url ? `Visit: ${org.url}` : "Research organization",
+              logo: "RX"
+            }))
+          : [{
+              name: "Research & Pharma Directory",
+              focus: apiDisease.treatmentsAndPharma,
+              why: "Current clinical research, pharmaceutical pipeline, and therapeutic programs",
+              logo: "RX"
+            }]
+        ) : [],
       faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
       myths: apiDisease.factsMyths?.map(fm => ({ 
         myth: fm.statement, 

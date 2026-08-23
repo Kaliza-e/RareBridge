@@ -2,10 +2,10 @@
   "name": "rarebridge-backend",
   "version": "1.0.0",
   "description": "RareBridge API backend",
-  "main": "dist/src/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/src/main.js",
+    "start": "node dist/main.js",
     "dev": "ts-node src/main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
