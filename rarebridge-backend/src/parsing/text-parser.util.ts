@@ -60,14 +60,6 @@ export interface LinkItem {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Truncate text to a maximum length with ellipsis
- */
-function truncateText(text: string, maxLength: number): string {
-  if (!text) return '';
-  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-}
-
-/**
  * Strip common bullet/number prefixes and trailing punctuation.
  */
 function cleanLine(line: string): string {
@@ -167,9 +159,8 @@ export function parseSymptomsList(text: string): string[] {
   }
 
   // Deduplicate and filter out section headers (all-caps short strings)
-  // Also limit to top 15 most relevant symptoms to keep it readable
   const filtered = [...new Set(items.filter(i => i && !/^[A-Z\s]{2,30}:$/.test(i)))];
-  return filtered.slice(0, 15);
+  return filtered;
 }
 
 // ─── Diagnosis ────────────────────────────────────────────────────────────────
@@ -229,9 +220,9 @@ export function parseDiagnosticSteps(text: string): DiagnosticStep[] {
 
     steps.push({
       name: name || 'Diagnostic Step',
-      what: truncateText(whatText, 200),
-      how: truncateText(howText, 150),
-      result: truncateText(resultText, 200),
+      what: whatText,
+      how: howText,
+      result: resultText,
     });
   }
 
@@ -241,12 +232,11 @@ export function parseDiagnosticSteps(text: string): DiagnosticStep[] {
       name: 'Diagnostic Process',
       what: 'Clinical evaluation and diagnostic review',
       how: 'Comprehensive assessment by specialized medical teams',
-      result: truncateText(cleanText(text), 300),
+      result: cleanText(text),
     });
   }
 
-  // Limit to top 5 diagnostic steps to keep it readable
-  return steps.slice(0, 5);
+  return steps;
 }
 
 // ─── Lifestyle ────────────────────────────────────────────────────────────────
@@ -312,17 +302,12 @@ export function parseLifestyleSection(text: string): LifestyleData {
     ? nutritionLines.join(' ')
     : otherLines.join(' ');
 
-  // Limit each section to keep it readable
-  const truncateList = (items: string[], maxItems: number) => {
-    return items.slice(0, maxItems);
-  };
-
   return {
-    therapies: truncateList(therapies, 5),
-    nutrition: cleanText(nutrition).substring(0, 500),
-    devices: truncateList(devices, 5),
-    caregiverTips: truncateList(caregiverTips, 5),
-    community: communityLines.join(' ').substring(0, 300),
+    therapies,
+    nutrition: cleanText(nutrition),
+    devices,
+    caregiverTips,
+    community: communityLines.join(' '),
     raw: text,
   };
 }
@@ -457,8 +442,7 @@ export function parseFaqs(text: string): ParsedFAQ[] {
     });
   }
 
-  // Limit to top 5 FAQs to keep it readable
-  return faqs.slice(0, 5);
+  return faqs;
 }
 
 // ─── Facts vs Myths ───────────────────────────────────────────────────────────
@@ -519,8 +503,7 @@ export function parseFactsMyths(text: string): ParsedFactMyth[] {
     i++;
   }
 
-  // Limit to top 5 facts/myths to keep it readable
-  return items.slice(0, 5);
+  return items;
 }
 
 // ─── Specialists ──────────────────────────────────────────────────────────────
@@ -529,16 +512,88 @@ export function parseFactsMyths(text: string): ParsedFactMyth[] {
  * Parse a specialists text blob into structured specialist entries.
  *
  * Recognizes:
- *   - Lines with "Dr." prefix
+ *   - Lines with "Dr." prefix followed by bullet points
  *   - Name | Org | Location | Focus patterns (pipe or comma separated)
- *   - Institutional names
+ *   - Google Sheets format with bullet points for details
  */
 export function parseSpecialists(text: string): ParsedSpecialist[] {
   if (!text) return [];
 
   const specialists: ParsedSpecialist[] = [];
   const lines = splitLines(text);
+  
+  // Try to parse Google Sheets format with bullet points
+  const googleSheetsSpecialists: ParsedSpecialist[] = [];
+  let currentSpecialist: Partial<ParsedSpecialist> = {};
+  
+  for (const rawLine of lines) {
+    const line = cleanLine(rawLine);
+    if (!line || line.length < 4) continue;
 
+    // Check if this line is a specialist name (usually has Dr., Prof., etc.)
+    const isNameLine = /^(Dr\.|Prof\.|MD|PhD)/i.test(line) && !line.startsWith('•');
+    
+    if (isNameLine) {
+      // Save previous specialist if exists
+      if (currentSpecialist.name) {
+        googleSheetsSpecialists.push({
+          name: currentSpecialist.name,
+          organization: currentSpecialist.organization || '',
+          location: currentSpecialist.location || '',
+          contact: currentSpecialist.contact || null,
+          focus: currentSpecialist.focus || 'Rare Disease Specialist',
+          why: currentSpecialist.why || ''
+        });
+      }
+      
+      // Start new specialist
+      currentSpecialist = {
+        name: line,
+        organization: '',
+        location: '',
+        contact: null,
+        focus: '',
+        why: line
+      };
+    } else if (line.startsWith('•') && currentSpecialist.name) {
+      // Parse bullet point details
+      const detail = line.replace(/^•\s*/, '').trim();
+      
+      if (detail.toLowerCase().startsWith('profession:') || detail.toLowerCase().startsWith('role:')) {
+        currentSpecialist.focus = detail.split(':').slice(1).join(':').trim();
+      } else if (detail.toLowerCase().startsWith('organization:') || detail.toLowerCase().startsWith('org:')) {
+        currentSpecialist.organization = detail.split(':').slice(1).join(':').trim();
+      } else if (detail.toLowerCase().startsWith('location:')) {
+        currentSpecialist.location = detail.split(':').slice(1).join(':').trim();
+      } else if (detail.toLowerCase().startsWith('contact:') || detail.toLowerCase().startsWith('email:') || detail.toLowerCase().startsWith('phone:')) {
+        currentSpecialist.contact = detail.split(':').slice(1).join(':').trim();
+      } else if (detail.toLowerCase().startsWith('specialization:') || detail.toLowerCase().startsWith('focus:')) {
+        currentSpecialist.focus = detail.split(':').slice(1).join(':').trim();
+      } else {
+        // Add to why field for additional context
+        currentSpecialist.why = (currentSpecialist.why || '') + ' ' + detail;
+      }
+    }
+  }
+  
+  // Don't forget the last specialist
+  if (currentSpecialist.name) {
+    googleSheetsSpecialists.push({
+      name: currentSpecialist.name,
+      organization: currentSpecialist.organization || '',
+      location: currentSpecialist.location || '',
+      contact: currentSpecialist.contact || null,
+      focus: currentSpecialist.focus || 'Rare Disease Specialist',
+      why: currentSpecialist.why || ''
+    });
+  }
+  
+  // If we found Google Sheets format specialists, use those
+  if (googleSheetsSpecialists.length > 0) {
+    return googleSheetsSpecialists;
+  }
+
+  // Fall back to original parsing for other formats
   for (const rawLine of lines) {
     const line = cleanLine(rawLine);
     if (!line || line.length < 4) continue;
@@ -582,8 +637,7 @@ export function parseSpecialists(text: string): ParsedSpecialist[] {
     });
   }
 
-  // Limit to top 5 specialists to keep it readable
-  return specialists.slice(0, 5);
+  return specialists;
 }
 
 // ─── Sources ──────────────────────────────────────────────────────────────────

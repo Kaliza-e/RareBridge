@@ -8,6 +8,13 @@ import { ZebraEmptyState, Accordion, ZebraMascot } from "../components/common/Vi
 import { apiService } from "../services/api.service";
 import type { Disease, DiagnosticStep, ResearchOrg, Specialist, Source } from "../services/api.service";
 
+// Define the causes structure type
+interface Causes {
+  genetic?: string;
+  environmental?: string;
+  unknown?: string;
+}
+
 // ─── Section helpers ──────────────────────────────────────────────────────────
 
 /** Symptom pill chip */
@@ -84,12 +91,32 @@ function FactMythBadge({ isFact }: { isFact: boolean }) {
 
 function SymptomsSection({ symptoms }: { symptoms: string[] }) {
   if (!symptoms || symptoms.length === 0) return <ZebraEmptyState message="No symptoms listed yet" sub="Content is being reviewed and updated." />;
+  
+  // Group symptoms by length/complexity for better organization
+  const shortSymptoms = symptoms.filter(s => s.length < 50);
+  const longSymptoms = symptoms.filter(s => s.length >= 50);
+  
   return (
     <SectionCard>
       <SectionHeader icon={Activity} title="Signs & Symptoms" iconBg="bg-accent" iconColor="text-secondary" />
-      <div className="flex flex-wrap gap-2">
-        {symptoms.map((s, i) => <SymptomPill key={i} text={s} />)}
-      </div>
+      
+      {longSymptoms.length > 0 && (
+        <div className="mb-6 space-y-3">
+          {longSymptoms.map((symptom, i) => (
+            <div key={i} className="bg-primary/5 rounded-xl p-4 border border-primary/20">
+              <p className="text-accent text-sm leading-relaxed">{symptom}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {shortSymptoms.length > 0 && (
+        <div>
+          <div className="flex flex-wrap gap-2">
+            {shortSymptoms.map((s, i) => <SymptomPill key={i} text={s} />)}
+          </div>
+        </div>
+      )}
     </SectionCard>
   );
 }
@@ -305,7 +332,7 @@ function SpecialistsSection({ specialists }: { specialists: Specialist[] }) {
   return (
     <SectionCard>
       <SectionHeader icon={Globe} title="Specialist Directory" iconBg="bg-secondary" iconColor="text-primary" />
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {specialists.map((spec, i) => {
           const initials = spec.name
             .split(" ")
@@ -316,33 +343,48 @@ function SpecialistsSection({ specialists }: { specialists: Specialist[] }) {
           return (
             <div
               key={i}
-              className="border border-taupe-40 rounded-2xl p-4 hover:border-primary/40 hover:shadow-md transition-all duration-200"
+              className="border border-taupe-40 rounded-2xl p-5 hover:border-primary/40 hover:shadow-md transition-all duration-200"
             >
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-ivory font-black text-sm shrink-0">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-ivory font-black text-sm shrink-0">
                   {initials}
                 </div>
-                <div>
-                  <h3 className="font-bold text-primary text-sm leading-tight">{spec.name}</h3>
-                  <p className="text-xs text-accent">{spec.organization}</p>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-bold text-primary text-base leading-tight">{spec.name}</h3>
+                      {spec.organization && (
+                        <p className="text-sm text-accent font-medium">{spec.organization}</p>
+                      )}
+                    </div>
+                    {spec.contact && (
+                      <LinkButton url={spec.contact} label="Contact" />
+                    )}
+                  </div>
+                  
+                  {spec.focus && (
+                    <div className="mb-3">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary/30 text-primary text-xs font-semibold">
+                        {spec.focus}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-2">
+                    {spec.location && (
+                      <div className="flex items-center gap-2 text-xs text-taupe">
+                        <MapPin className="w-3.5 h-3.5 shrink-0" />
+                        <span>{spec.location}</span>
+                      </div>
+                    )}
+                    {spec.why && spec.why !== spec.name && (
+                      <p className="text-xs text-accent leading-relaxed mt-2 italic">
+                        {spec.why.length > 150 ? spec.why.substring(0, 150) + '...' : spec.why}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-              {spec.focus && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary/30 text-primary text-[11px] font-semibold mb-2">
-                  {spec.focus}
-                </span>
-              )}
-              {spec.location && (
-                <div className="flex items-center gap-1 text-xs text-taupe">
-                  <MapPin className="w-3 h-3 shrink-0" />
-                  <span>{spec.location}</span>
-                </div>
-              )}
-              {spec.contact && (
-                <div className="mt-2">
-                  <LinkButton url={spec.contact} label="Contact" />
-                </div>
-              )}
             </div>
           );
         })}
@@ -595,7 +637,39 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
         {activeSection === 1 && (
           <SectionCard>
             <SectionHeader icon={FlaskConical} title="Causes" iconBg="bg-primary" iconColor="text-secondary" />
-            <p className="text-accent leading-relaxed">{disease.causes}</p>
+            {typeof disease.causes === 'object' && disease.causes !== null ? (
+              <div className="space-y-4">
+                {(disease.causes as Causes).genetic && (
+                  <div className="bg-primary/5 rounded-xl p-4 border border-primary/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Dna className="w-4 h-4 text-primary" />
+                      <h4 className="font-bold text-primary text-sm">Genetic Factors</h4>
+                    </div>
+                    <p className="text-accent text-sm leading-relaxed">{(disease.causes as Causes).genetic}</p>
+                  </div>
+                )}
+                {(disease.causes as Causes).environmental && (disease.causes as Causes).environmental !== "Unknown" && (
+                  <div className="bg-secondary/5 rounded-xl p-4 border border-secondary/20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FlaskConical className="w-4 h-4 text-primary" />
+                      <h4 className="font-bold text-primary text-sm">Environmental Factors</h4>
+                    </div>
+                    <p className="text-accent text-sm leading-relaxed">{(disease.causes as Causes).environmental}</p>
+                  </div>
+                )}
+                {(disease.causes as Causes).unknown && (disease.causes as Causes).unknown !== "Unknown" && (
+                  <div className="bg-taupe-10 rounded-xl p-4 border border-taupe-40">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertCircle className="w-4 h-4 text-accent" />
+                      <h4 className="font-bold text-primary text-sm">Additional Factors</h4>
+                    </div>
+                    <p className="text-accent text-sm leading-relaxed">{(disease.causes as Causes).unknown}</p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-accent leading-relaxed">{disease.causes}</p>
+            )}
           </SectionCard>
         )}
 

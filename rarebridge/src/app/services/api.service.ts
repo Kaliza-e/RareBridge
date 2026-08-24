@@ -59,7 +59,7 @@ export interface Disease {
   name: string;
   category: string;
   overview: string;
-  causes: string;
+  causes: string | { genetic?: string; environmental?: string; unknown?: string };
   /** Smart-parsed symptom list */
   typesAndSymptoms: string[];
   /** Smart-parsed diagnostic steps */

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, SlidersHorizontal, X, BookOpen } from "lucide-react";
+import { Search, SlidersHorizontal, X, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { DISEASES, CATEGORY_FILTERS, STATUS_FILTERS, fetchDiseasesFromAPI } from "../data";
 import { ZebraEmptyState, DiseaseCard, ButterflyDoodle, EdelweissFlower } from "../components/common/Visuals";
 
@@ -10,6 +10,8 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [diseases, setDiseases] = useState(DISEASES);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     async function loadDiseases() {
@@ -17,6 +19,7 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
       try {
         const apiDiseases = await fetchDiseasesFromAPI(query, cat === "All" ? undefined : cat);
         setDiseases(apiDiseases);
+        setCurrentPage(1); // Reset to page 1 when data changes
       } catch (error) {
         console.error('Failed to load diseases:', error);
         setDiseases(DISEASES);
@@ -34,6 +37,19 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
     const matchS = status === "All Status" || (d as any).researchStatus === status;
     return matchQ && matchC && matchS;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = filtered.slice(startIndex, endIndex);
+
+  // Reset to page 1 if current page exceeds total pages
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   const hasActiveFilters = cat !== "All" || status !== "All Status";
 
@@ -190,12 +206,33 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
           <p className="text-sm text-taupe font-medium">
             <span className="font-black text-primary text-base">{filtered.length}</span> disease{filtered.length !== 1 ? "s" : ""} found
           </p>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-taupe-40 hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft className="w-4 h-4 text-primary" />
+              </button>
+              <span className="text-sm font-medium text-primary">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg border border-taupe-40 hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight className="w-4 h-4 text-primary" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Grid ── */}
-        {filtered.length > 0 ? (
+        {currentItems.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map(d => (
+            {currentItems.map(d => (
               <DiseaseCard key={d.id} disease={d} onClick={() => onDisease(d.id)} />
             ))}
           </div>

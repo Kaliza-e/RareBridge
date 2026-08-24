@@ -5,73 +5,338 @@ import {
 } from "lucide-react";
 import { apiService, Disease as ApiDisease } from "./services/api.service";
 
+// Helper function to extract environmental causes from text
+function extractEnvironmentalCauses(text: string): string {
+  if (!text) return "Unknown environmental factors";
+  const environmentalKeywords = ['environmental', 'lifestyle', 'diet', 'exercise', 'exposure', 'toxin', 'pollution', 'radiation', 'chemical'];
+  const lowerText = text.toLowerCase();
+  
+  if (environmentalKeywords.some(keyword => lowerText.includes(keyword))) {
+    return text.length > 200 ? text.substring(0, 200) + '...' : text;
+  }
+  return "No known environmental triggers identified";
+}
+
 export const NAV_LINKS = ["Home", "About","Explore Diseases", "Research", "Specialists", "Community" ];
 
-export const SUGGESTED_SEARCHES = ["Krabbe Disease", "Rett Syndrome", "Batten Disease", "Duchenne Muscular Dystrophy"];
+export const SUGGESTED_SEARCHES = ["Amyloidosis", "Adrenocortical Carcinoma", "Alexander Disease", "Batten Disease", "Angiosarcoma", "ALS"];
 
 // Fallback data for when API is not available
 const FALLBACK_DISEASES = [
   {
-    id: "krabbe",
-    name: "Krabbe Disease",
-    category: "Genetic · Neurological",
-    categoryBadges: ["Genetic", "Neurological"],
+    id: "amyloidosis",
+    name: "Amyloidosis",
+    category: "Genetic",
+    categoryBadges: ["Genetic"],
     icon: Brain,
     color: "navy",
-    shortDesc: "A rare inherited disorder that destroys the protective coating of nerve cells in the brain and nervous system.",
+    shortDesc: "Amyloidosis happens when misfolded proteins build up in organs such as the heart, kidneys, or nerves. The organs affected and the symptoms depend on the type.",
     researchStatus: "Active Research",
-    inheritance: "Autosomal Recessive",
-    ageAppearance: "Early Infancy (0–6 months)",
-    severity: "Severe",
-    symptoms: ["Muscle weakness", "Developmental delays", "Vision problems", "Hearing loss", "Seizures", "High fever", "Vomiting", "Feeding difficulties"],
+    inheritance: "Genetic",
+    ageAppearance: "Variable",
+    severity: "Variable",
+    symptoms: ["Organ dysfunction", "Fatigue", "Weight loss", "Nerve damage", "Kidney problems", "Heart issues"],
     overview: {
-      simple: "Krabbe disease is a serious condition where the body cannot make a substance called galactocerebrosidase. This enzyme is needed to protect the nerves. Without it, the fatty covering around the nerves (called myelin) breaks down. This damages the brain and nervous system.",
-      medical: "Krabbe disease (globoid cell leukodystrophy) is caused by deficient activity of galactocerebrosidase (GALC), resulting in accumulation of psychosine, a cytotoxic lipid that causes apoptosis of oligodendrocytes, progressive demyelination, and gliosis throughout the central and peripheral nervous systems."
+      simple: "Amyloidosis happens when misfolded proteins build up in organs. The type determines which organs are affected and what symptoms appear.",
+      medical: "Amyloidosis is caused by misfolded proteins that accumulate in organs and tissues, forming amyloid deposits that interfere with normal function."
     },
     causes: {
-      genetic: "Mutations in the GALC gene on chromosome 14q31 lead to deficient galactocerebrosidase enzyme. Both copies of the gene must carry mutations (autosomal recessive). Over 70 different GALC mutations have been identified.",
-      environmental: "No environmental triggers are known. Krabbe disease is entirely caused by inherited genetic mutations.",
-      unknown: "The exact relationship between genotype and phenotype is not fully understood. Some mutations cause early-onset, others late-onset disease."
+      genetic: "Some forms are inherited, especially hereditary ATTR, which is linked to changes in the TTR gene and can be passed to each child with a 50% chance.",
+      environmental: "No environmental triggers are known for most forms. AA amyloidosis is linked to long-lasting inflammation or infection.",
+      unknown: "For many people, the reason the proteins misfold is unknown."
     },
     types: [
-      { stage: "Birth", type: "Infantile (most common)", symptoms: ["Extreme irritability", "High muscle tone", "Feeding difficulties"], severity: "Severe" },
-      { stage: "Childhood", type: "Late-Infantile", symptoms: ["Developmental regression", "Seizures", "Vision loss"], severity: "Severe" },
-      { stage: "Adolescence", type: "Juvenile", symptoms: ["Progressive weakness", "Loss of coordination", "Cognitive decline"], severity: "Moderate–Severe" },
-      { stage: "Adulthood", type: "Adult-Onset", symptoms: ["Leg weakness", "Vision problems", "Memory issues"], severity: "Variable" }
+      { stage: "Adult", type: "AL amyloidosis", symptoms: ["Age 65+", "More common in men", "Affects multiple organs"], severity: "Severe" },
+      { stage: "Adult", type: "Wild-type ATTR", symptoms: ["Men over 60", "Heart involvement", "Carpal tunnel syndrome"], severity: "Variable" },
+      { stage: "Variable", type: "Hereditary ATTR", symptoms: ["Nerve disease", "Heart disease", "Can appear young"], severity: "Variable" },
+      { stage: "Adult", type: "AA amyloidosis", symptoms: ["Long-standing inflammation", "Kidney problems"], severity: "Moderate" }
     ],
     diagnosis: [
-      { name: "Enzyme Activity Test (GALC)", what: "A blood or skin cell test measuring galactocerebrosidase enzyme levels.", how: "A small blood sample or skin biopsy is collected. Lab technicians measure the enzyme's activity level.", result: "Enzyme activity below 0–5% of normal is diagnostic for Krabbe disease." },
-      { name: "Genetic (DNA) Testing", what: "A test that looks directly at the GALC gene for mutations.", how: "Blood is drawn and DNA is extracted. The GALC gene is sequenced to find mutations.", result: "Finding two pathogenic GALC mutations confirms the diagnosis." }
+      { name: "Tissue Biopsy", what: "Removing a small tissue sample to examine under microscope for amyloid deposits.", how: "A doctor takes a sample from affected organ (often fat pad or bone marrow).", result: "Presence of amyloid deposits confirms diagnosis." },
+      { name: "Genetic Testing", what: "Testing for mutations in genes associated with hereditary amyloidosis.", how: "Blood sample is analyzed for gene mutations.", result: "Finding specific mutations confirms hereditary type." }
     ],
     lifestyle: {
       therapies: [
-        { name: "Physical Therapy", desc: "Helps maintain muscle strength, prevent contractures, and support mobility as long as possible.", icon: Activity },
-        { name: "Occupational Therapy", desc: "Supports daily activities, fine motor skills, and positioning for comfort and function.", icon: Heart },
-        { name: "Speech Therapy", desc: "Addresses swallowing difficulties and communication needs as the disease progresses.", icon: MessageCircle }
+        { name: "Physical Therapy", desc: "Helps maintain function and manage symptoms.", icon: Activity },
+        { name: "Occupational Therapy", desc: "Supports daily activities and adaptation.", icon: Heart }
       ],
-      nutrition: "Many children need specialized nutritional support due to swallowing difficulties. Gastrostomy tube (G-tube) feeding often becomes necessary to ensure adequate nutrition and reduce aspiration risk.",
-      devices: ["Wheelchair or stroller systems", "Custom seating for positioning", "AAC communication devices", "Suction machines", "Feeding tubes (G-tube)", "Pulse oximetry monitors"],
-      caregiverTips: ["Keep a daily symptom journal to share with your care team", "Join the Krabbe Disease Family Network for peer support", "Ask about palliative care early — it helps alongside treatments", "Coordinate with a rare disease specialist center", "Apply for disability support services and financial assistance"]
+      nutrition: "Nutritional support may be needed depending on which organs are affected.",
+      devices: ["Assistive devices for mobility", "Heart monitoring equipment"],
+      caregiverTips: ["Monitor organ function regularly", "Follow treatment plans carefully", "Join support groups for patients"]
     },
     research: [
-      { name: "Forge Biologics", focus: "Gene therapy for Krabbe disease using AAV vectors", why: "Leading gene therapy company with active IND for Krabbe treatment", logo: "FB" },
-      { name: "Hunter's Hope Foundation", focus: "Research funding and newborn screening advocacy", why: "Jim Kelly's foundation dedicated entirely to Krabbe disease", logo: "HH" }
+      { name: "Research Institutions", focus: "Developing new treatments for amyloidosis", why: "Ongoing clinical trials for medications that stop amyloid formation", logo: "RX" }
     ],
     faqs: [
-      { q: "What causes Krabbe disease?", a: "Krabbe disease is caused by mutations in the GALC gene, which provides instructions for making the galactocerebrosidase enzyme. Without this enzyme, toxic substances build up and destroy the myelin sheath protecting nerve cells." }
+      { q: "Is amyloidosis hereditary?", a: "Some forms are hereditary (ATTR), while others (AL, AA) are generally not inherited." }
     ],
     myths: [
-      { myth: "Rare diseases only affect children.", fact: "Many rare diseases appear during adulthood. Late-onset forms of Krabbe disease can manifest in adolescence or adult years." }
+      { myth: "Amyloidosis only affects the elderly.", fact: "While common in older adults, hereditary forms can appear much earlier in life." }
     ],
     specialists: [
-      { name: "Dr. Maria Santos", role: "Pediatric Neurologist", org: "Boston Children's Hospital", location: "Boston, MA", specialization: "Leukodystrophies & Metabolic Brain Disorders", publications: 47 }
+      { name: "Specialist Team", role: "Multi-disciplinary", org: "Medical Centers", location: "Various", specialization: "Amyloidosis experts", publications: 0 }
     ]
   },
-  { id: "gaucher", name: "Gaucher Disease", category: "Genetic · Metabolic", categoryBadges: ["Genetic", "Metabolic"], icon: Dna, color: "sapphire", shortDesc: "The most common lysosomal storage disorder, caused by a deficiency of the enzyme glucocerebrosidase.", researchStatus: "Approved Treatment", inheritance: "Autosomal Recessive", ageAppearance: "Childhood to Adulthood", severity: "Moderate", symptoms: ["Enlarged spleen", "Bone pain", "Fatigue", "Easy bruising", "Low platelet count"] },
-  { id: "pompe", name: "Pompe Disease", category: "Genetic · Metabolic", categoryBadges: ["Genetic", "Metabolic"], icon: Heart, color: "taupe", shortDesc: "A rare inherited disorder caused by a buildup of glycogen in cells, affecting muscle and nerve function.", researchStatus: "Approved Treatment", inheritance: "Autosomal Recessive", ageAppearance: "Any Age", severity: "Severe", symptoms: ["Muscle weakness", "Breathing difficulties", "Heart problems", "Feeding difficulties"] },
-  { id: "rett", name: "Rett Syndrome", category: "Genetic · Neurological", categoryBadges: ["Genetic", "Neurological"], icon: Brain, color: "navy", shortDesc: "A rare neurodevelopmental disorder affecting girls, caused by mutations in the MECP2 gene.", researchStatus: "Active Research", inheritance: "X-Linked", ageAppearance: "6–18 months", severity: "Severe", symptoms: ["Loss of purposeful hand use", "Breathing irregularities", "Seizures", "Communication difficulties"] },
-  { id: "batten", name: "Batten Disease", category: "Genetic · Neurological", categoryBadges: ["Genetic", "Neurological"], icon: Zap, color: "sapphire", shortDesc: "A fatal nervous system disorder that begins in childhood, causing vision loss, seizures, and progressive loss of motor and cognitive skills.", researchStatus: "Active Research", inheritance: "Autosomal Recessive", ageAppearance: "5–10 years", severity: "Severe", symptoms: ["Vision loss", "Seizures", "Cognitive decline", "Motor deterioration", "Behavioral changes"] },
-  { id: "dmd", name: "Duchenne Muscular Dystrophy", category: "Genetic · Neurological", categoryBadges: ["Genetic", "Neurological"], icon: Activity, color: "taupe", shortDesc: "A severe form of muscular dystrophy caused by mutations in the DMD gene, affecting muscle fiber maintenance.", researchStatus: "Approved Treatment", inheritance: "X-Linked Recessive", ageAppearance: "2–5 years", severity: "Severe", symptoms: ["Progressive muscle weakness", "Difficulty walking", "Calf enlargement", "Cardiomyopathy", "Breathing difficulties"] }
+  {
+    id: "adrenocortical-carcinoma",
+    name: "Adrenocortical Carcinoma",
+    category: "Rare Adrenal Cancer",
+    categoryBadges: ["Rare Adrenal Cancer"],
+    icon: Heart,
+    color: "sapphire",
+    shortDesc: "A rare, aggressive cancer that starts in the outer layer of the adrenal glands, which sit above the kidneys.",
+    researchStatus: "Active Research",
+    inheritance: "Mostly sporadic",
+    ageAppearance: "Variable",
+    severity: "Severe",
+    symptoms: ["Weight gain", "High blood pressure", "Muscle weakness", "Abdominal pain", "Hormone changes"],
+    overview: {
+      simple: "Adrenocortical carcinoma is a rare cancer of the adrenal glands that can cause hormone-related symptoms and abdominal pain.",
+      medical: "ACC is a malignant tumor arising from the adrenal cortex, often presenting with hormonal excess or local mass effect."
+    },
+    causes: {
+      genetic: "The exact cause is unknown, but a significant percentage of cases, especially in children, are caused by inherited genetic syndromes.",
+      environmental: "No known environmental triggers have been identified.",
+      unknown: "Most cases happen randomly with no family history."
+    },
+    types: [
+      { stage: "All ages", type: "Hormone-producing", symptoms: ["Hormone excess", "Visible physical changes"], severity: "Variable" },
+      { stage: "Adults", type: "Silent tumors", symptoms: ["Few early symptoms", "Later abdominal pain"], severity: "Severe" }
+    ],
+    diagnosis: [
+      { name: "Blood Hormone Test", what: "Measures adrenal hormone levels in blood.", how: "Blood sample taken and analyzed for hormone levels.", result: "Elevated hormones suggest hormone-producing tumor." },
+      { name: "Imaging (CT/MRI)", what: "Detailed imaging to locate and characterize the tumor.", how: "Patient lies in scanner while images are taken.", result: "Shows tumor size, location, and spread." }
+    ],
+    lifestyle: {
+      therapies: [
+        { name: "Hormone Management", desc: "Managing hormone-related symptoms.", icon: Activity }
+      ],
+      nutrition: "Nutritional support may be needed depending on symptoms.",
+      devices: [],
+      caregiverTips: ["Monitor blood pressure", "Watch for hormone changes", "Follow surgical recovery plans"]
+    },
+    research: [
+      { name: "Cancer Centers", focus: "ACC research and clinical trials", why: "Ongoing research into targeted therapies", logo: "RX" }
+    ],
+    faqs: [
+      { q: "What are the first symptoms?", a: "Symptoms depend on whether the tumor produces hormones. Hormone-producing tumors cause visible changes; silent tumors may not show symptoms until they grow large." }
+    ],
+    myths: [
+      { myth: "ACC only affects children.", fact: "While more common in children under 5, adults ages 40-50 also develop ACC." }
+    ],
+    specialists: [
+      { name: "Endocrine Specialists", role: "Hormone experts", org: "Medical Centers", location: "Various", specialization: "Adrenal disorders", publications: 0 }
+    ]
+  },
+  {
+    id: "alexander-disease",
+    name: "Alexander Disease",
+    category: "Genetic",
+    categoryBadges: ["Genetic"],
+    icon: Brain,
+    color: "navy",
+    shortDesc: "A rare genetic disorder that affects the nervous system and leads to developmental delays and neurological problems.",
+    researchStatus: "Active Research",
+    inheritance: "Autosomal Dominant",
+    ageAppearance: "Infancy to childhood",
+    severity: "Severe",
+    symptoms: ["Developmental delay", "Megalencephaly", "Seizures", "Spasticity", "Progressive neurological decline"],
+    overview: {
+      simple: "Alexander Disease is a rare genetic disorder that primarily affects the nervous system, causing developmental delays and progressive neurological problems.",
+      medical: "Alexander Disease is caused by mutations in the GFAP gene, leading to abnormal protein accumulation in astrocytes and white matter degeneration."
+    },
+    causes: {
+      genetic: "Caused by mutations in the GFAP gene. Most cases are sporadic, but it can be inherited in an autosomal dominant pattern.",
+      environmental: "No environmental factors are known to cause Alexander Disease.",
+      unknown: "The exact mechanism by which GFAP mutations lead to the disease is still being studied."
+    },
+    types: [
+      { stage: "Infancy", type: "Neonatal", symptoms: ["Severe developmental delay", "Seizures", "Hydrocephalus"], severity: "Very Severe" },
+      { stage: "Childhood", type: "Juvenile", symptoms: ["Ataxia", "Dysphagia", "Cognitive decline"], severity: "Severe" },
+      { stage: "Adulthood", type: "Adult", symptoms: ["Ataxia", "Dysarthria", "Sleep apnea"], severity: "Moderate" }
+    ],
+    diagnosis: [
+      { name: "Genetic Testing", what: "Testing for GFAP gene mutations.", how: "Blood sample analyzed for GFAP mutations.", result: "GFAP mutation confirms diagnosis." },
+      { name: "MRI", what: "Brain imaging to look for characteristic white matter changes.", how: "Patient undergoes MRI scan.", result: "White matter abnormalities support diagnosis." }
+    ],
+    lifestyle: {
+      therapies: [
+        { name: "Physical Therapy", desc: "Helps maintain mobility and function.", icon: Activity },
+        { name: "Speech Therapy", desc: "Addresses swallowing and communication issues.", icon: MessageCircle }
+      ],
+      nutrition: "Feeding support may be needed due to swallowing difficulties.",
+      devices: ["Feeding tubes", "Wheelchairs", "Communication devices"],
+      caregiverTips: ["Monitor developmental milestones", "Address seizures promptly", "Provide supportive care"]
+    },
+    research: [
+      { name: "Research Organizations", focus: "GFAP mutation research", why: "Understanding disease mechanisms and potential treatments", logo: "RX" }
+    ],
+    faqs: [
+      { q: "Is Alexander Disease inherited?", a: "Most cases are sporadic, but it can be inherited in an autosomal dominant pattern when a parent has the GFAP mutation." }
+    ],
+    myths: [
+      { myth: "Alexander Disease only affects children.", fact: "While most common in infants, juvenile and adult forms also exist." }
+    ],
+    specialists: [
+      { name: "Neurologists", role: "Nervous system specialists", org: "Medical Centers", location: "Various", specialization: "Genetic neurological disorders", publications: 0 }
+    ]
+  },
+  {
+    id: "batten-disease",
+    name: "Batten Disease",
+    category: "Genetic · Neurological",
+    categoryBadges: ["Genetic", "Neurological"],
+    icon: Zap,
+    color: "sapphire",
+    shortDesc: "A fatal nervous system disorder that begins in childhood, causing vision loss, seizures, and progressive loss of motor and cognitive skills.",
+    researchStatus: "Active Research",
+    inheritance: "Autosomal Recessive",
+    ageAppearance: "5–10 years",
+    severity: "Severe",
+    symptoms: ["Vision loss", "Seizures", "Cognitive decline", "Motor deterioration", "Behavioral changes"],
+    overview: {
+      simple: "Batten Disease is a group of fatal nervous system disorders that begin in childhood and progressively worsen, affecting vision, thinking, and movement.",
+      medical: "Batten Disease (neuronal ceroid lipofuscinoses) are lysosomal storage disorders caused by mutations in various genes (CLN genes), leading to neuronal death."
+    },
+    causes: {
+      genetic: "Caused by mutations in CLN genes. Both parents must carry the mutation (autosomal recessive). Different CLN genes cause different disease types.",
+      environmental: "No environmental factors are known to cause Batten Disease.",
+      unknown: "The exact mechanisms by which CLN mutations lead to neuronal death are still being researched."
+    },
+    types: [
+      { stage: "Infancy", type: "CLN1 (Infantile)", symptoms: ["Language delay", "Ataxia", "Vision loss"], severity: "Very Severe" },
+      { stage: "Late childhood", type: "CLN2 (Late-infantile)", symptoms: ["Seizures", "Developmental regression", "Vision loss"], severity: "Very Severe" },
+      { stage: "Childhood", type: "CLN3 (Juvenile)", symptoms: ["Vision loss", "Cognitive decline", "Behavioral changes"], severity: "Severe" }
+    ],
+    diagnosis: [
+      { name: "Genetic Testing", what: "Testing for mutations in CLN genes.", how: "Blood sample analyzed for CLN gene mutations.", result: "CLN mutation confirms specific disease type." },
+      { name: "EEG", what: "Brain wave monitoring to detect seizure activity.", how: "Electrodes placed on scalp record brain activity.", result: "Abnormal patterns support diagnosis." }
+    ],
+    lifestyle: {
+      therapies: [
+        { name: "Physical Therapy", desc: "Helps maintain mobility as long as possible.", icon: Activity },
+        { name: "Occupational Therapy", desc: "Supports daily functioning and adaptation.", icon: Heart }
+      ],
+      nutrition: "Feeding support often needed as swallowing difficulties develop.",
+      devices: ["Wheelchairs", "Feeding tubes", "Communication devices", "Seizure monitoring equipment"],
+      caregiverTips: ["Seizure safety precautions", "Vision support adaptations", "Behavioral management strategies"]
+    },
+    research: [
+      { name: "Batten Disease Support", focus: "Research funding and family support", why: "Dedicated to finding treatments and supporting families", logo: "RX" }
+    ],
+    faqs: [
+      { q: "How is Batten Disease inherited?", a: "Batten Disease is inherited in an autosomal recessive pattern, meaning both parents must carry the gene mutation." }
+    ],
+    myths: [
+      { myth: "Batten Disease is contagious.", fact: "Batten Disease is a genetic disorder and cannot be caught from others." }
+    ],
+    specialists: [
+      { name: "Pediatric Neurologists", role: "Child brain specialists", org: "Medical Centers", location: "Various", specialization: "Neurodegenerative disorders", publications: 0 }
+    ]
+  },
+  {
+    id: "angiosarcoma",
+    name: "Angiosarcoma",
+    category: "Rare Cancer",
+    categoryBadges: ["Rare Cancer"],
+    icon: Heart,
+    color: "taupe",
+    shortDesc: "A rare cancer that develops in the inner lining of blood vessels or lymph vessels, often appearing as a bruise-like lesion on the skin.",
+    researchStatus: "Active Research",
+    inheritance: "Not inherited",
+    ageAppearance: "Older adults",
+    severity: "Aggressive",
+    symptoms: ["Skin lesions", "Bruise-like appearance", "Swelling", "Pain", "Bleeding"],
+    overview: {
+      simple: "Angiosarcoma is a rare cancer that starts in blood vessels. It often appears as a bruise on the skin and can grow quickly.",
+      medical: "Angiosarcoma is a malignant tumor arising from endothelial cells of blood or lymph vessels, with a high tendency for local recurrence and metastasis."
+    },
+    causes: {
+      genetic: "Not typically inherited. Some cases associated with radiation therapy or chronic lymphedema.",
+      environmental: "Chronic lymphedema, radiation exposure, and certain chemicals are risk factors.",
+      unknown: "The exact cause in many cases remains unknown."
+    },
+    types: [
+      { stage: "Skin", type: "Cutaneous", symptoms: ["Bruise-like lesions", "Skin discoloration", "Bleeding"], severity: "Aggressive" },
+      { stage: "Internal organs", type: "Visceral", symptoms: ["Organ-specific symptoms", "Pain", "Weight loss"], severity: "Very Aggressive" }
+    ],
+    diagnosis: [
+      { name: "Biopsy", what: "Removing tissue sample for examination.", how: "Doctor removes sample from suspicious area.", result: "Microscopic examination confirms cancer type." },
+      { name: "Imaging", what: "CT/MRI/PET scans to assess extent.", how: "Patient undergoes imaging studies.", result: "Shows tumor size, location, and spread." }
+    ],
+    lifestyle: {
+      therapies: [
+        { name: "Radiation Therapy", desc: "Often used after surgery to kill remaining cancer cells.", icon: Activity }
+      ],
+      nutrition: "Nutritional support may be needed during treatment.",
+      devices: ["Compression garments", "Lymphedema management tools"],
+      caregiverTips: ["Monitor for skin changes", "Watch for bleeding", "Support during treatment recovery"]
+    },
+    research: [
+      { name: "Cancer Research Centers", focus: "Angiosarcoma clinical trials", why: "Developing new targeted therapies", logo: "RX" }
+    ],
+    faqs: [
+      { q: "What does angiosarcoma look like?", a: "It often appears as a bruise-like purple or red lesion on the skin that may grow over time." }
+    ],
+    myths: [
+      { myth: "Angiosarcoma is just a bad bruise.", fact: "While it may look like a bruise, angiosarcoma is a serious cancer that requires medical treatment." }
+    ],
+    specialists: [
+      { name: "Oncologists", role: "Cancer specialists", org: "Cancer Centers", location: "Various", specialization: "Sarcoma treatment", publications: 0 }
+    ]
+  },
+  {
+    id: "als",
+    name: "Amyotrophic Lateral Sclerosis",
+    category: "Neurological",
+    categoryBadges: ["Neurological"],
+    icon: Activity,
+    color: "navy",
+    shortDesc: "A progressive neurodegenerative disease that affects nerve cells in the brain and spinal cord, causing loss of muscle control.",
+    researchStatus: "Active Research",
+    inheritance: "Mostly sporadic",
+    ageAppearance: "40-70 years",
+    severity: "Progressive",
+    symptoms: ["Muscle weakness", "Difficulty speaking", "Trouble swallowing", "Breathing problems", "Paralysis"],
+    overview: {
+      simple: "ALS is a disease that gradually affects nerve cells controlling muscles, leading to progressive weakness and paralysis.",
+      medical: "ALS is characterized by degeneration of motor neurons in the cerebral cortex, brainstem, and spinal cord, resulting in progressive muscle atrophy and weakness."
+    },
+    causes: {
+      genetic: "About 5-10% of cases are familial (inherited), caused by mutations in genes like SOD1, C9orf72, TARDBP, and FUS.",
+      environmental: "Possible environmental factors being studied, but no definitive causes identified.",
+      unknown: "In 90-95% of cases, the cause is unknown (sporadic ALS)."
+    },
+    types: [
+      { stage: "All", type: "Sporadic", symptoms: ["Most common form", "Unknown cause", "Progressive weakness"], severity: "Severe" },
+      { stage: "Familial", type: "Familial", symptoms: ["Inherited", "Similar symptoms", "Earlier onset possible"], severity: "Severe" }
+    ],
+    diagnosis: [
+      { name: "EMG/NCS", what: "Electromyography and nerve conduction studies to assess muscle and nerve function.", how: "Electrodes measure electrical activity in muscles and nerves.", result: "Abnormal patterns support ALS diagnosis." },
+      { name: "MRI", what: "Brain and spinal cord imaging to rule out other conditions.", how: "Patient undergoes MRI scan.", result: "Helps exclude other neurological conditions." }
+    ],
+    lifestyle: {
+      therapies: [
+        { name: "Physical Therapy", desc: "Helps maintain mobility and function as long as possible.", icon: Activity },
+        { name: "Speech Therapy", desc: "Addresses communication and swallowing difficulties.", icon: MessageCircle }
+      ],
+      nutrition: "Feeding tube often needed when swallowing becomes difficult.",
+      devices: ["Wheelchairs", "Communication devices", "Ventilators", "Feeding tubes"],
+      caregiverTips: ["Breathing support planning", "Communication adaptations", "Respiratory monitoring"]
+    },
+    research: [
+      { name: "ALS Research Centers", focus: "Finding treatments and cure", why: "Extensive research into gene therapy and neuroprotection", logo: "RX" }
+    ],
+    faqs: [
+      { q: "Is ALS always fatal?", a: "ALS is currently fatal, but treatments can extend life and improve quality of life. Research continues to find a cure." }
+    ],
+    myths: [
+      { myth: "ALS is contagious.", fact: "ALS is not contagious and cannot be spread from person to person." }
+    ],
+    specialists: [
+      { name: "Neurologists", role: "Nervous system specialists", org: "ALS Clinics", location: "Various", specialization: "Motor neuron diseases", publications: 0 }
+    ]
+  }
 ];
 
 // Function to fetch diseases from API
@@ -84,7 +349,7 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
       id: apiDisease.id,
       name: apiDisease.name,
       category: apiDisease.category,
-      categoryBadges: apiDisease.category ? apiDisease.category.split(/[·,]/).map(c => c.trim()).filter(Boolean) : ["Rare Disease"],
+      categoryBadges: apiDisease.category ? apiDisease.category.split(/[·,]/).map((c: string) => c.trim()).filter(Boolean) : ["Rare Disease"],
       icon: Brain,
       color: "navy",
       shortDesc: apiDisease.overview ? (apiDisease.overview.length > 180 ? apiDisease.overview.substring(0, 180) + '...' : apiDisease.overview) : 'Comprehensive rare disease details and support resources.',
@@ -101,11 +366,13 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
         simple: apiDisease.overview || "Overview information being updated.",
         medical: apiDisease.overview || "Medical overview being updated."
       },
-      causes: {
-        genetic: apiDisease.causes || "Genetic & environmental cause information.",
-        environmental: "Unknown",
-        unknown: "Unknown"
-      },
+      causes: typeof apiDisease.causes === 'object' && apiDisease.causes !== null ?
+        apiDisease.causes :
+        {
+          genetic: apiDisease.causes || "Genetic & environmental cause information.",
+          environmental: extractEnvironmentalCauses(apiDisease.causes || ""),
+          unknown: "Additional factors may contribute to this condition."
+        },
       types: [],
       diagnosis: apiDisease.diagnosis ? 
         (Array.isArray(apiDisease.diagnosis) 
@@ -211,4 +478,13 @@ export const FEATURES = [
   { icon: Shield, title: "Trusted Sources", desc: "All information is reviewed by medical professionals and sourced from leading institutions." },
 ];
 
-export type Disease = typeof DISEASES[0];
+// Extended interface for causes structure
+interface Causes {
+  genetic?: string;
+  environmental?: string;
+  unknown?: string;
+}
+
+export type Disease = typeof DISEASES[0] & {
+  causes: string | Causes;
+};
