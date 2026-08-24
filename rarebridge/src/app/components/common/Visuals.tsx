@@ -3,9 +3,10 @@ import {
   Bot, Star,
   AlertCircle, Stethoscope, ClipboardList, Syringe, Users as UsersIcon, Microscope as MicroscopeIcon,
   Thermometer, HeartPulse, Pill, Users, FlaskConical, UserCircle, BookOpen, Sparkles, Zap, Trophy, Target,
-  Flame, Award, CheckCircle, XCircle, Lock
+  Flame, Award, CheckCircle, XCircle, Lock, Download
 } from "lucide-react";
 import { Disease } from "../../data";
+import { generateDiseasePDF } from "../../utils/pdf-generator";
 
 
 

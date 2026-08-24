@@ -93,15 +93,24 @@ function splitLines(text: string): string[] {
  */
 export function extractLinks(text: string): LinkItem[] {
   if (!text) return [];
-  const urlRegex = /(https?:\/\/[^\s,;)\]]+)/gi;
+  const urlRegex = /(https?:\/\/[^\s,;)\]]+|www\.[^\s,;)\]]+)/gi;
   const items: LinkItem[] = [];
   let match: RegExpExecArray | null;
   while ((match = urlRegex.exec(text)) !== null) {
-    const url = match[1].replace(/[.,;)]+$/, ''); // strip trailing punctuation
-    // Try to grab surrounding text as label (20 chars before URL)
+    let rawUrl = match[1].replace(/[.,;)]+$/, ''); // strip trailing punctuation
+    const url = rawUrl.startsWith('http://') || rawUrl.startsWith('https://') ? rawUrl : `https://${rawUrl}`;
+    
+    let hostname = url;
+    try {
+      hostname = new URL(url).hostname;
+    } catch {
+      hostname = rawUrl;
+    }
+
+    // Try to grab surrounding text as label (60 chars before URL)
     const before = text.substring(Math.max(0, match.index - 60), match.index).trim();
     const labelMatch = before.match(/([A-Z][^.!?\n]{5,60})$/);
-    const label = labelMatch ? labelMatch[1].trim() : new URL(url).hostname;
+    const label = labelMatch ? labelMatch[1].trim() : hostname;
     items.push({ url, label });
   }
   return items;

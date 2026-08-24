@@ -59,8 +59,8 @@ export default function Navbar({
   return (
     <nav
       className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-          ? "bg-white/98 shadow-[0_1px_24px_0_rgba(0,0,0,0.07)]"
-          : "bg-ivory/90"
+        ? "bg-white/98 shadow-[0_1px_24px_0_rgba(0,0,0,0.07)]"
+        : "bg-ivory/90"
         } backdrop-blur-xl`}
     >
       {/* Navbar container */}
@@ -70,14 +70,15 @@ export default function Navbar({
           {/* Logo */}
           <button
             onClick={() => handleNavigation("home")}
-            className="flex items-center group shrink-0 py-1 transition-transform duration-200 hover:scale-[1.03]"
+            className="flex items-center group shrink-0 py-1 transition-transform duration-200 hover:scale-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
             aria-label="Go to RareBridge home"
           >
-            <div className="flex items-center gap-2">
-              <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm">
-                R
-              </div>
-              <span className="text-xl font-bold text-primary tracking-tight">RareBridge</span>
+            <div className="relative flex items-center">
+              <img
+                src="/logo.png"
+                alt="RareBridge"
+                className="h-16 sm:h-18 md:h-22 w-auto object-contain mix-blend-multiply transition-all duration-300 group-hover:brightness-105"
+              />
             </div>
           </button>
 
