@@ -306,10 +306,7 @@ export default function App() {
 
       {/* Navbar */}
       {view !== "signin" && view !== "signup" && (
-        <Navbar
-          onNav={handleNav}
-          activeView={view}
-        />
+        <Navbar onNav={handleNav} activeView={view} />
       )}
 
       {/* Main content */}

@@ -8,12 +8,11 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-6 mb-6">
           <div>
             <div className="mb-2">
-              <div className="inline-flex items-center gap-2 bg-white/95 rounded-xl p-2 shadow-sm">
-                <div className="h-6 w-6 bg-primary rounded-md flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                  R
-                </div>
-                <span className="text-sm font-bold text-primary tracking-tight pr-1">RareBridge</span>
-              </div>
+              <img
+                src="/logo-transparent.png"
+                alt="RareBridge"
+                className="h-20 w-auto object-contain brightness-0 invert"
+              />
             </div>
             <p className="text-xs text-taupe leading-relaxed mb-3">Connecting families, researchers, and specialists with trusted rare disease information.</p>
             <div className="flex items-center gap-1.5 text-[11px] text-taupe">

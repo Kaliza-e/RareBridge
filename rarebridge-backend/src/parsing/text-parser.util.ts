@@ -45,9 +45,13 @@ export interface ParsedFactMyth {
 
 export interface ParsedSpecialist {
   name: string;
+  profession: string;
+  specialization: string;
   organization: string;
   location: string;
   contact: string | null;
+  publications: string;
+  /** Legacy compat fields */
   focus: string;
   why: string;
 }
@@ -91,7 +95,7 @@ export function extractLinks(text: string): LinkItem[] {
   while ((match = urlRegex.exec(text)) !== null) {
     let rawUrl = match[1].replace(/[.,;)]+$/, ''); // strip trailing punctuation
     const url = rawUrl.startsWith('http://') || rawUrl.startsWith('https://') ? rawUrl : `https://${rawUrl}`;
-    
+
     let hostname = url;
     try {
       hostname = new URL(url).hostname;
@@ -343,7 +347,7 @@ export function parseResearchOrgs(text: string): ResearchOrg[] {
       });
     }
     currentName = '';
-      currentFocusLines = [];
+    currentFocusLines = [];
     currentUrl = null;
   }
 
@@ -511,98 +515,144 @@ export function parseFactsMyths(text: string): ParsedFactMyth[] {
 /**
  * Parse a specialists text blob into structured specialist entries.
  *
- * Recognizes:
- *   - Lines with "Dr." prefix followed by bullet points
- *   - Name | Org | Location | Focus patterns (pipe or comma separated)
- *   - Google Sheets format with bullet points for details
+/**
+ * Parse a specialists text blob from Google Sheets.
+ *
+ * The sheet format uses "Specialist Name:" as the block separator.
+ * Each block may contain any of these labeled fields in any order:
+ *   Specialist Name:, Profession:, Specialization:, Organization:,
+ *   Location:, Contact Information:, Recent Publications:
+ *
+ * Flow:
+ *   Raw text → split on "Specialist Name:" → parse each block's labels → structured objects
  */
 export function parseSpecialists(text: string): ParsedSpecialist[] {
-  if (!text) return [];
+  if (!text || typeof text !== 'string') return [];
 
-  const specialists: ParsedSpecialist[] = [];
-  const lines = splitLines(text);
-  
-  // Try to parse Google Sheets format with bullet points
-  const googleSheetsSpecialists: ParsedSpecialist[] = [];
-  let currentSpecialist: Partial<ParsedSpecialist> = {};
-  
-  for (const rawLine of lines) {
-    const line = cleanLine(rawLine);
-    if (!line || line.length < 4) continue;
+  // ── Step 1: split the raw text into per-specialist blocks ──────────────────
+  // Split on every occurrence of "Specialist Name:" (case-insensitive)
+  const blockSeparator = /Specialist\s+Name\s*:/gi;
 
-    // Check if this line is a specialist name (usually has Dr., Prof., etc.)
-    const isNameLine = /^(Dr\.|Prof\.|MD|PhD)/i.test(line) && !line.startsWith('•');
-    
-    if (isNameLine) {
-      // Save previous specialist if exists
-      if (currentSpecialist.name) {
-        googleSheetsSpecialists.push({
-          name: currentSpecialist.name,
-          organization: currentSpecialist.organization || '',
-          location: currentSpecialist.location || '',
-          contact: currentSpecialist.contact || null,
-          focus: currentSpecialist.focus || 'Rare Disease Specialist',
-          why: currentSpecialist.why || ''
-        });
-      }
-      
-      // Start new specialist
-      currentSpecialist = {
-        name: line,
-        organization: '',
-        location: '',
-        contact: null,
-        focus: '',
-        why: line
-      };
-    } else if (line.startsWith('•') && currentSpecialist.name) {
-      // Parse bullet point details
-      const detail = line.replace(/^•\s*/, '').trim();
-      
-      if (detail.toLowerCase().startsWith('profession:') || detail.toLowerCase().startsWith('role:')) {
-        currentSpecialist.focus = detail.split(':').slice(1).join(':').trim();
-      } else if (detail.toLowerCase().startsWith('organization:') || detail.toLowerCase().startsWith('org:')) {
-        currentSpecialist.organization = detail.split(':').slice(1).join(':').trim();
-      } else if (detail.toLowerCase().startsWith('location:')) {
-        currentSpecialist.location = detail.split(':').slice(1).join(':').trim();
-      } else if (detail.toLowerCase().startsWith('contact:') || detail.toLowerCase().startsWith('email:') || detail.toLowerCase().startsWith('phone:')) {
-        currentSpecialist.contact = detail.split(':').slice(1).join(':').trim();
-      } else if (detail.toLowerCase().startsWith('specialization:') || detail.toLowerCase().startsWith('focus:')) {
-        currentSpecialist.focus = detail.split(':').slice(1).join(':').trim();
-      } else {
-        // Add to why field for additional context
-        currentSpecialist.why = (currentSpecialist.why || '') + ' ' + detail;
-      }
+  // Find all match positions so we can slice the text between them
+  const positions: number[] = [];
+  let m: RegExpExecArray | null;
+  const separatorRe = new RegExp(blockSeparator.source, 'gi');
+  while ((m = separatorRe.exec(text)) !== null) {
+    positions.push(m.index);
+  }
+
+  if (positions.length === 0) {
+    // No "Specialist Name:" found — fall back to legacy parsing
+    return parseSpecialistsLegacy(text);
+  }
+
+  const results: ParsedSpecialist[] = [];
+
+  for (let i = 0; i < positions.length; i++) {
+    // Grab everything from "Specialist Name:" up to the next one (or end of string)
+    const blockStart = positions[i];
+    const blockEnd = i + 1 < positions.length ? positions[i + 1] : text.length;
+    const block = text.slice(blockStart, blockEnd);
+
+    const specialist = parseSpecialistBlock(block);
+    if (specialist) results.push(specialist);
+  }
+
+  return results;
+}
+
+/**
+ * Parse a single specialist block (starting with "Specialist Name:").
+ * Matches each known label and extracts the value up to the next label or end.
+ */
+function parseSpecialistBlock(block: string): ParsedSpecialist | null {
+  // Labels we recognise, in a safe order for extraction
+  const LABELS: { key: keyof RawSpecialistFields; patterns: string[] }[] = [
+    { key: 'name', patterns: ['Specialist Name'] },
+    { key: 'profession', patterns: ['Profession'] },
+    { key: 'specialization', patterns: ['Specialization'] },
+    { key: 'organization', patterns: ['Organization'] },
+    { key: 'location', patterns: ['Location'] },
+    { key: 'contact', patterns: ['Contact Information', 'Contact'] },
+    { key: 'publications', patterns: ['Recent Publications', 'Publications'] },
+  ];
+
+  // Build a regex that matches any label followed by optional whitespace and colon
+  const allPatterns = LABELS.flatMap(l => l.patterns).join('|');
+  const labelRe = new RegExp(`(${allPatterns})\\s*:`, 'gi');
+
+  // Find positions of every label occurrence inside this block
+  interface LabelPos { key: keyof RawSpecialistFields; start: number; valueStart: number }
+  const found: LabelPos[] = [];
+  let lm: RegExpExecArray | null;
+  while ((lm = labelRe.exec(block)) !== null) {
+    const matched = lm[1].trim();
+    // Resolve which key this matched pattern belongs to
+    const labelDef = LABELS.find(l =>
+      l.patterns.some(p => p.toLowerCase() === matched.toLowerCase())
+    );
+    if (labelDef) {
+      found.push({ key: labelDef.key, start: lm.index, valueStart: lm.index + lm[0].length });
     }
   }
-  
-  // Don't forget the last specialist
-  if (currentSpecialist.name) {
-    googleSheetsSpecialists.push({
-      name: currentSpecialist.name,
-      organization: currentSpecialist.organization || '',
-      location: currentSpecialist.location || '',
-      contact: currentSpecialist.contact || null,
-      focus: currentSpecialist.focus || 'Rare Disease Specialist',
-      why: currentSpecialist.why || ''
-    });
-  }
-  
-  // If we found Google Sheets format specialists, use those
-  if (googleSheetsSpecialists.length > 0) {
-    return googleSheetsSpecialists;
+
+  if (found.length === 0) return null;
+
+  const fields: RawSpecialistFields = {};
+
+  for (let i = 0; i < found.length; i++) {
+    const { key, valueStart } = found[i];
+    const valueEnd = i + 1 < found.length ? found[i + 1].start : block.length;
+    const raw = block.slice(valueStart, valueEnd).trim();
+    // Collapse newlines and extra whitespace
+    fields[key] = raw.replace(/\s*[\r\n]+\s*/g, ' ').trim();
   }
 
-  // Fall back to original parsing for other formats
+  // Must have at least a name to be a valid record
+  const name = fields.name?.trim();
+  if (!name) return null;
+
+  return {
+    name,
+    profession: fields.profession || '',
+    specialization: fields.specialization || '',
+    organization: fields.organization || '',
+    location: fields.location || '',
+    contact: fields.contact || null,
+    publications: fields.publications || '',
+    // Legacy fields kept for backward compat with existing frontend
+    focus: fields.specialization || fields.profession || 'Rare Disease Specialist',
+    why: name,
+  };
+}
+
+interface RawSpecialistFields {
+  name?: string;
+  profession?: string;
+  specialization?: string;
+  organization?: string;
+  location?: string;
+  contact?: string;
+  publications?: string;
+}
+
+/**
+ * Legacy fallback for text not using "Specialist Name:" blocks.
+ * Handles pipe-separated, Dr.-prefixed, or free-text lines.
+ */
+function parseSpecialistsLegacy(text: string): ParsedSpecialist[] {
+  const results: ParsedSpecialist[] = [];
+  const lines = splitLines(text);
+
   for (const rawLine of lines) {
     const line = cleanLine(rawLine);
     if (!line || line.length < 4) continue;
 
-    // Try pipe-separated: "Dr. Smith | Mayo Clinic | Rochester, MN | Genetics"
-    const pipeParts = line.split(/\s*[|]\s*/);
+    const pipeParts = line.split(/\s*\|\s*/);
     if (pipeParts.length >= 2) {
-      specialists.push({
+      results.push({
         name: pipeParts[0]?.trim() || 'Specialist',
+        profession: '', specialization: '', publications: '',
         organization: pipeParts[1]?.trim() || '',
         location: pipeParts[2]?.trim() || '',
         contact: null,
@@ -612,11 +662,11 @@ export function parseSpecialists(text: string): ParsedSpecialist[] {
       continue;
     }
 
-    // Try dash/comma separated: "Dr. Smith, Mayo Clinic, Rochester"
     const commaParts = line.split(/\s*[,\-]\s*/).filter(Boolean);
     if (commaParts.length >= 2 && /^Dr\.?/i.test(commaParts[0])) {
-      specialists.push({
+      results.push({
         name: commaParts[0]?.trim() || 'Specialist',
+        profession: '', specialization: '', publications: '',
         organization: commaParts[1]?.trim() || '',
         location: commaParts[2]?.trim() || '',
         contact: null,
@@ -625,20 +675,11 @@ export function parseSpecialists(text: string): ParsedSpecialist[] {
       });
       continue;
     }
-
-    // Fallback: treat whole line as the name/organization
-    specialists.push({
-      name: line.length < 60 ? line : 'Specialist / Institution',
-      organization: line.length >= 60 ? line.substring(0, 60) + '...' : '',
-      location: '',
-      contact: null,
-      focus: 'Rare Disease Specialist',
-      why: line,
-    });
   }
 
-  return specialists;
+  return results;
 }
+
 
 // ─── Sources ──────────────────────────────────────────────────────────────────
 

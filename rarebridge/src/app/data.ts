@@ -1,7 +1,7 @@
 import {
   Brain, Dna, Heart, Activity, Zap, Users, Bot, Shield,
   BookOpen, Stethoscope, Microscope, Footprints, Star,
-  FlaskConical, Baby, ClipboardList, Syringe, MessageCircle,AlertCircle, HandHeart, MapPin, Phone, Globe
+  FlaskConical, Baby, ClipboardList, Syringe, MessageCircle, AlertCircle, HandHeart, MapPin, Phone, Globe
 } from "lucide-react";
 import { apiService, Disease as ApiDisease } from "./services/api.service";
 
@@ -10,14 +10,14 @@ function extractEnvironmentalCauses(text: string): string {
   if (!text) return "Unknown environmental factors";
   const environmentalKeywords = ['environmental', 'lifestyle', 'diet', 'exercise', 'exposure', 'toxin', 'pollution', 'radiation', 'chemical'];
   const lowerText = text.toLowerCase();
-  
+
   if (environmentalKeywords.some(keyword => lowerText.includes(keyword))) {
     return text.length > 200 ? text.substring(0, 200) + '...' : text;
   }
   return "No known environmental triggers identified";
 }
 
-export const NAV_LINKS = ["Home", "About","Explore Diseases", "Research", "Specialists", "Community" ];
+export const NAV_LINKS = ["Home", "About", "Explore Diseases", "Research", "Specialists", "Community"];
 
 export const SUGGESTED_SEARCHES = ["Amyloidosis", "Adrenocortical Carcinoma", "Alexander Disease", "Batten Disease", "Angiosarcoma", "ALS"];
 
@@ -74,7 +74,61 @@ const FALLBACK_DISEASES = [
       { myth: "Amyloidosis only affects the elderly.", fact: "While common in older adults, hereditary forms can appear much earlier in life." }
     ],
     specialists: [
-      { name: "Specialist Team", role: "Multi-disciplinary", org: "Medical Centers", location: "Various", specialization: "Amyloidosis experts", publications: 0 }
+      {
+        name: "Dr. Morie Gertz",
+        profession: "Hematologist",
+        specialization: "Systemic Amyloidosis, AL Amyloidosis, Multiple Myeloma",
+        organization: "Mayo Clinic",
+        location: "Rochester, Minnesota, USA",
+        contact: "https://www.mayoclinic.org",
+        publications: "Over 400 peer-reviewed publications on amyloidosis diagnosis and treatment.",
+        focus: "Hematologist",
+        why: "Dr. Morie Gertz"
+      },
+      {
+        name: "Dr. Giampaolo Merlini",
+        profession: "Internist & Haematologist",
+        specialization: "Amyloidosis, Plasma Cell Disorders",
+        organization: "University of Pavia – Amyloidosis Research and Treatment Centre",
+        location: "Pavia, Italy",
+        contact: "https://www.unipv.eu",
+        publications: "Pioneering research on AL amyloidosis diagnosis and novel therapies.",
+        focus: "Internist & Haematologist",
+        why: "Dr. Giampaolo Merlini"
+      },
+      {
+        name: "Dr. John Berk",
+        profession: "Cardiologist & Internist",
+        specialization: "ATTR Amyloidosis, Cardiac Amyloidosis",
+        organization: "Boston University Amyloidosis Center",
+        location: "Boston, Massachusetts, USA",
+        contact: "https://www.bumc.bu.edu/amyloid",
+        publications: "Extensive work on transthyretin amyloid cardiomyopathy and tafamidis therapy.",
+        focus: "Cardiologist & Internist",
+        why: "Dr. John Berk"
+      },
+      {
+        name: "Dr. Ashutosh Wechalekar",
+        profession: "Consultant Haematologist",
+        specialization: "AL Amyloidosis, Stem Cell Transplantation",
+        organization: "University College London Hospitals NHS Foundation Trust",
+        location: "London, United Kingdom",
+        contact: "https://www.uclh.nhs.uk",
+        publications: "Key contributions to AL amyloidosis clinical trials and treatment guidelines.",
+        focus: "Consultant Haematologist",
+        why: "Dr. Ashutosh Wechalekar"
+      },
+      {
+        name: "Dr. Mathew Maurer",
+        profession: "Cardiologist",
+        specialization: "Cardiac Amyloidosis, Wild-Type ATTR",
+        organization: "Columbia University Irving Medical Center",
+        location: "New York, New York, USA",
+        contact: "https://www.columbiadoctors.org",
+        publications: "Led landmark trials including ATTR-ACT for tafamidis in ATTR cardiomyopathy.",
+        focus: "Cardiologist",
+        why: "Dr. Mathew Maurer"
+      }
     ]
   },
   {
@@ -343,7 +397,7 @@ const FALLBACK_DISEASES = [
 export async function fetchDiseasesFromAPI(search?: string, category?: string) {
   try {
     const apiDiseases = await apiService.getDiseases(search, category);
-    
+
     // Transform API data to frontend format
     const transformedDiseases = apiDiseases.map((apiDisease: ApiDisease) => ({
       id: apiDisease.id,
@@ -357,9 +411,9 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
       inheritance: "Genetic",
       ageAppearance: "Variable",
       severity: "Severe",
-      symptoms: apiDisease.typesAndSymptoms ? 
-        (Array.isArray(apiDisease.typesAndSymptoms) 
-          ? apiDisease.typesAndSymptoms 
+      symptoms: apiDisease.typesAndSymptoms ?
+        (Array.isArray(apiDisease.typesAndSymptoms)
+          ? apiDisease.typesAndSymptoms
           : apiDisease.typesAndSymptoms.split(/\r?\n|•|,/).map(s => s.trim()).filter(Boolean)
         ) : [],
       overview: {
@@ -374,15 +428,15 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
           unknown: "Additional factors may contribute to this condition."
         },
       types: [],
-      diagnosis: apiDisease.diagnosis ? 
-        (Array.isArray(apiDisease.diagnosis) 
-          ? apiDisease.diagnosis 
+      diagnosis: apiDisease.diagnosis ?
+        (Array.isArray(apiDisease.diagnosis)
+          ? apiDisease.diagnosis
           : [{
-              name: "Diagnostic Process",
-              what: "Clinical evaluation, genetic tests, and diagnostic review",
-              how: "Comprehensive assessment by specialized medical teams",
-              result: apiDisease.diagnosis
-            }]
+            name: "Diagnostic Process",
+            what: "Clinical evaluation, genetic tests, and diagnostic review",
+            how: "Comprehensive assessment by specialized medical teams",
+            result: apiDisease.diagnosis
+          }]
         ) : [],
       lifestyle: typeof apiDisease.lifestyleAndDailySupport === 'object' && apiDisease.lifestyleAndDailySupport !== null ?
         {
@@ -397,36 +451,39 @@ export async function fetchDiseasesFromAPI(search?: string, category?: string) {
           devices: [],
           caregiverTips: []
         },
-      research: apiDisease.treatmentsAndPharma ? 
-        (Array.isArray(apiDisease.treatmentsAndPharma) 
+      research: apiDisease.treatmentsAndPharma ?
+        (Array.isArray(apiDisease.treatmentsAndPharma)
           ? apiDisease.treatmentsAndPharma.map(org => ({
-              name: org.name,
-              focus: org.focus,
-              why: org.url ? `Visit: ${org.url}` : "Research organization",
-              logo: "RX"
-            }))
+            name: org.name,
+            focus: org.focus,
+            why: org.url ? `Visit: ${org.url}` : "Research organization",
+            logo: "RX"
+          }))
           : [{
-              name: "Research & Pharma Directory",
-              focus: apiDisease.treatmentsAndPharma,
-              why: "Current clinical research, pharmaceutical pipeline, and therapeutic programs",
-              logo: "RX"
-            }]
+            name: "Research & Pharma Directory",
+            focus: apiDisease.treatmentsAndPharma,
+            why: "Current clinical research, pharmaceutical pipeline, and therapeutic programs",
+            logo: "RX"
+          }]
         ) : [],
       faqs: apiDisease.faqs?.map(faq => ({ q: faq.question, a: faq.answer })) || [],
-      myths: apiDisease.factsMyths?.map(fm => ({ 
-        myth: fm.statement, 
-        fact: fm.isFact ? `[Fact] ${fm.explanation}` : `[Myth] ${fm.explanation}` 
+      myths: apiDisease.factsMyths?.map(fm => ({
+        myth: fm.statement,
+        fact: fm.isFact ? `[Fact] ${fm.explanation}` : `[Myth] ${fm.explanation}`
       })) || [],
       specialists: apiDisease.specialists?.map(spec => ({
         name: spec.name,
-        role: spec.focus,
-        org: spec.organization,
-        location: spec.location,
-        specialization: spec.focus,
-        publications: 0
+        profession: (spec as any).profession || spec.focus || "",
+        specialization: (spec as any).specialization || spec.focus || "",
+        organization: spec.organization || "",
+        location: spec.location || "",
+        contact: spec.contact || null,
+        publications: (spec as any).publications || "",
+        focus: spec.focus || "",
+        why: spec.why || spec.name
       })) || []
     }));
-    
+
     return transformedDiseases;
   } catch (error) {
     console.error('Failed to fetch diseases from API, using fallback data:', error);
@@ -441,15 +498,15 @@ export const CATEGORY_FILTERS = ["All", "Genetic", "Neurological", "Metabolic", 
 export const STATUS_FILTERS = ["All Status", "Active Research", "Approved Treatment", "Support Available"];
 
 export const COLOR_MAP: Record<string, { bg: string; text: string; badge: string; ring: string; iconBg: string }> = {
-  navy:    { bg: "bg-secondary",    text: "text-primary", badge: "bg-primary text-ivory", ring: "ring-taupe", iconBg: "bg-primary" },
-  sapphire:{ bg: "bg-ivory",    text: "text-accent", badge: "bg-accent text-ivory", ring: "ring-taupe", iconBg: "bg-accent" },
-  taupe:   { bg: "bg-taupe-20", text: "text-primary", badge: "bg-taupe text-primary", ring: "ring-taupe", iconBg: "bg-taupe" },
+  navy: { bg: "bg-secondary", text: "text-primary", badge: "bg-primary text-ivory", ring: "ring-taupe", iconBg: "bg-primary" },
+  sapphire: { bg: "bg-ivory", text: "text-accent", badge: "bg-accent text-ivory", ring: "ring-taupe", iconBg: "bg-accent" },
+  taupe: { bg: "bg-taupe-20", text: "text-primary", badge: "bg-taupe text-primary", ring: "ring-taupe", iconBg: "bg-taupe" },
 };
 
 export const STATUS_COLOR: Record<string, string> = {
-  "Active Research":    "bg-accent-10 text-accent",
+  "Active Research": "bg-accent-10 text-accent",
   "Approved Treatment": "bg-emerald-100 text-emerald-700",
-  "Support Available":  "bg-amber-100 text-amber-700",
+  "Support Available": "bg-amber-100 text-amber-700",
 };
 
 export const JOURNEY_STEPS = [

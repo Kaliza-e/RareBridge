@@ -262,7 +262,7 @@ export default function HomePage({
           HERO
       ===================================================== */}
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#F8FAFD] via-white to-white">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#F8FAFD] via-[#F8FAFD] to-white">
         {/* Curvy decorative lines in hero */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" viewBox="0 0 1000 600">
           <path d="M0 100 Q250 50 500 100 T1000 100" stroke="var(--primary)" strokeWidth="3" fill="none" />
@@ -1014,7 +1014,7 @@ export default function HomePage({
                 </div>
               </div>
             ) : diseases.length > 0 ? (
-              diseases.map((d) => (
+              diseases.slice(0, 6).map((d) => (
                 <DiseaseCard
                   key={d.id}
                   disease={d}

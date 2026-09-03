@@ -35,7 +35,7 @@ export class ValidationService {
       if (data[field] !== undefined && data[field] !== null && typeof data[field] === 'number') {
         data[field] = String(data[field]);
       }
-      
+
       if (!data[field]) {
         errors.push(`${field} is required and must be a non-empty string`);
       } else if (typeof data[field] !== 'string') {
@@ -171,21 +171,23 @@ export class ValidationService {
   }
 
   private validateSpecialist(spec: any): { valid: boolean; data: any } {
-    const required = ['name', 'organization', 'location', 'focus', 'why'];
-    for (const field of required) {
-      if (!spec[field] || typeof spec[field] !== 'string') {
-        return { valid: false, data: spec };
-      }
+    // Only name is strictly required — all other fields are optional
+    if (!spec.name || typeof spec.name !== 'string' || spec.name.trim() === '') {
+      return { valid: false, data: spec };
     }
     return {
       valid: true,
       data: {
         name: cleanText(spec.name),
-        organization: cleanText(spec.organization),
-        location: cleanText(spec.location),
+        profession: spec.profession ? cleanText(spec.profession) : '',
+        specialization: spec.specialization ? cleanText(spec.specialization) : '',
+        organization: spec.organization ? cleanText(spec.organization) : '',
+        location: spec.location ? cleanText(spec.location) : '',
         contact: spec.contact ? cleanText(spec.contact) : null,
-        focus: cleanText(spec.focus),
-        why: cleanText(spec.why)
+        publications: spec.publications ? cleanText(spec.publications) : '',
+        // Legacy compat
+        focus: spec.focus || spec.specialization || spec.profession || 'Rare Disease Specialist',
+        why: spec.why || spec.name,
       }
     };
   }
@@ -217,42 +219,42 @@ export class ValidationService {
         return hasCoreFields;
       })
       .map(row => {
-      const transformed: any = { ...row };
+        const transformed: any = { ...row };
 
-      // Google Sheets may return diseaseNumber as a number
-      if (transformed.diseaseNumber !== undefined && transformed.diseaseNumber !== null) {
-        transformed.diseaseNumber = String(transformed.diseaseNumber).trim();
-      }
-
-      // Normalize all string fields
-      const stringFields = [
-        'name', 'category', 'overview', 'causes',
-        'typesAndSymptoms', 'diagnosis', 'lifestyleAndDailySupport', 'treatmentsAndPharma',
-      ];
-
-      for (const field of stringFields) {
-        if (transformed[field] !== undefined && transformed[field] !== null) {
-          transformed[field] = String(transformed[field]).trim();
+        // Google Sheets may return diseaseNumber as a number
+        if (transformed.diseaseNumber !== undefined && transformed.diseaseNumber !== null) {
+          transformed.diseaseNumber = String(transformed.diseaseNumber).trim();
         }
-      }
 
-      // Parse nested JSON data if present in string form
-      ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
-        if (transformed[field] && typeof transformed[field] === 'string') {
-          const raw = transformed[field].trim();
-          if (raw === '') {
-            transformed[field] = [];
-            return;
-          }
-          try {
-            transformed[field] = JSON.parse(raw);
-          } catch {
-            // Leave as string — validation service will parse it with smart parsers
+        // Normalize all string fields
+        const stringFields = [
+          'name', 'category', 'overview', 'causes',
+          'typesAndSymptoms', 'diagnosis', 'lifestyleAndDailySupport', 'treatmentsAndPharma',
+        ];
+
+        for (const field of stringFields) {
+          if (transformed[field] !== undefined && transformed[field] !== null) {
+            transformed[field] = String(transformed[field]).trim();
           }
         }
+
+        // Parse nested JSON data if present in string form
+        ['faqs', 'factsMyths', 'specialists', 'sources'].forEach(field => {
+          if (transformed[field] && typeof transformed[field] === 'string') {
+            const raw = transformed[field].trim();
+            if (raw === '') {
+              transformed[field] = [];
+              return;
+            }
+            try {
+              transformed[field] = JSON.parse(raw);
+            } catch {
+              // Leave as string — validation service will parse it with smart parsers
+            }
+          }
+        });
+
+        return transformed;
       });
-
-      return transformed;
-    });
   }
 }

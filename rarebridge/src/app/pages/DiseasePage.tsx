@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import {
   ChevronDown, Bot, Upload, Send, AlertCircle, Dna, FlaskConical,
   Baby, Activity, Shield, BookOpen, Globe, MapPin, Star, ExternalLink,
-  CheckCircle, XCircle, Stethoscope, Pill, Heart, Users, FileText, Link2
+  CheckCircle, XCircle, Stethoscope, Pill, Heart, Users, FileText, Link2,
+  Download
 } from "lucide-react";
 import { ZebraEmptyState, Accordion, ZebraMascot } from "../components/common/Visuals";
 import { apiService } from "../services/api.service";
@@ -91,15 +92,15 @@ function FactMythBadge({ isFact }: { isFact: boolean }) {
 
 function SymptomsSection({ symptoms }: { symptoms: string[] }) {
   if (!symptoms || symptoms.length === 0) return <ZebraEmptyState message="No symptoms listed yet" sub="Content is being reviewed and updated." />;
-  
+
   // Group symptoms by length/complexity for better organization
   const shortSymptoms = symptoms.filter(s => s.length < 50);
   const longSymptoms = symptoms.filter(s => s.length >= 50);
-  
+
   return (
     <SectionCard>
       <SectionHeader icon={Activity} title="Signs & Symptoms" iconBg="bg-accent" iconColor="text-secondary" />
-      
+
       {longSymptoms.length > 0 && (
         <div className="mb-6 space-y-3">
           {longSymptoms.map((symptom, i) => (
@@ -109,7 +110,7 @@ function SymptomsSection({ symptoms }: { symptoms: string[] }) {
           ))}
         </div>
       )}
-      
+
       {shortSymptoms.length > 0 && (
         <div>
           <div className="flex flex-wrap gap-2">
@@ -301,11 +302,10 @@ function FactsMythsSection({ items }: { items: any[] }) {
         {[...myths, ...facts].map((item, i) => (
           <div
             key={i}
-            className={`rounded-2xl p-4 border-2 transition-all duration-200 hover:shadow-md ${
-              item.isFact
-                ? "border-primary/20 bg-primary/5 hover:border-primary/40"
-                : "border-accent/20 bg-accent/5 hover:border-accent/40"
-            }`}
+            className={`rounded-2xl p-4 border-2 transition-all duration-200 hover:shadow-md ${item.isFact
+              ? "border-primary/20 bg-primary/5 hover:border-primary/40"
+              : "border-accent/20 bg-accent/5 hover:border-accent/40"
+              }`}
           >
             <div className="flex items-start gap-3">
               <div className="mt-0.5 shrink-0">
@@ -340,49 +340,68 @@ function SpecialistsSection({ specialists }: { specialists: Specialist[] }) {
             .slice(0, 2)
             .join("")
             .toUpperCase();
+
+          // Resolve display fields — prefer new parsed fields, fall back to legacy
+          const professionLine = (spec as any).profession || (spec as any).specialization || spec.focus || "";
+          const specializationLine = (spec as any).specialization && (spec as any).profession
+            ? (spec as any).specialization
+            : "";
+          const publications = (spec as any).publications || "";
+
           return (
             <div
               key={i}
               className="border border-taupe-40 rounded-2xl p-5 hover:border-primary/40 hover:shadow-md transition-all duration-200"
             >
               <div className="flex items-start gap-4">
+                {/* Avatar */}
                 <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-ivory font-black text-sm shrink-0">
                   {initials}
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-bold text-primary text-base leading-tight">{spec.name}</h3>
-                      {spec.organization && (
-                        <p className="text-sm text-accent font-medium">{spec.organization}</p>
-                      )}
-                    </div>
+
+                <div className="flex-1 min-w-0">
+                  {/* Name + contact */}
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <h3 className="font-bold text-primary text-base leading-tight">{spec.name}</h3>
                     {spec.contact && (
                       <LinkButton url={spec.contact} label="Contact" />
                     )}
                   </div>
-                  
-                  {spec.focus && (
-                    <div className="mb-3">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary/30 text-primary text-xs font-semibold">
-                        {spec.focus}
-                      </span>
-                    </div>
+
+                  {/* Profession */}
+                  {professionLine && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary/30 text-primary text-xs font-semibold mb-2">
+                      {professionLine}
+                    </span>
                   )}
-                  
-                  <div className="space-y-2">
+
+                  {/* Specialization (if separate from profession) */}
+                  {specializationLine && (
+                    <p className="text-xs text-accent font-medium mb-2">{specializationLine}</p>
+                  )}
+
+                  {/* Organization + location row */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                    {spec.organization && (
+                      <div className="flex items-center gap-1.5 text-xs text-taupe">
+                        <Globe className="w-3.5 h-3.5 shrink-0" />
+                        <span>{spec.organization}</span>
+                      </div>
+                    )}
                     {spec.location && (
-                      <div className="flex items-center gap-2 text-xs text-taupe">
+                      <div className="flex items-center gap-1.5 text-xs text-taupe">
                         <MapPin className="w-3.5 h-3.5 shrink-0" />
                         <span>{spec.location}</span>
                       </div>
                     )}
-                    {spec.why && spec.why !== spec.name && (
-                      <p className="text-xs text-accent leading-relaxed mt-2 italic">
-                        {spec.why.length > 150 ? spec.why.substring(0, 150) + '...' : spec.why}
-                      </p>
-                    )}
                   </div>
+
+                  {/* Publications */}
+                  {publications && (
+                    <p className="text-xs text-accent leading-relaxed mt-2 italic line-clamp-2">
+                      📄 {publications}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -420,9 +439,8 @@ function SourcesSection({ sources }: { sources: Source[] }) {
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <p className="font-semibold text-primary text-sm leading-tight truncate">{source.title}</p>
                 <span
-                  className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                    typeColors[source.type] || typeColors["Reference"]
-                  }`}
+                  className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border ${typeColors[source.type] || typeColors["Reference"]
+                    }`}
                 >
                   {source.type}
                 </span>
@@ -450,6 +468,225 @@ function SourcesSection({ sources }: { sources: Source[] }) {
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
+
+// ─── PDF Download ────────────────────────────────────────────────────────────
+
+function downloadDiseaseAsPDF(disease: Disease) {
+  const logo = window.location.origin + "/logo-transparent.png";
+  const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+  // ── HTML helpers ────────────────────────────────────────────────────────────
+  const esc = (s: string) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const row = (label: string, value: string) =>
+    `<tr>
+      <td style="padding:6px 12px 6px 0;font-weight:600;color:#112250;width:180px;vertical-align:top">${esc(label)}</td>
+      <td style="padding:6px 0;color:#3b507d">${esc(value)}</td>
+    </tr>`;
+
+  const pill = (text: string) =>
+    `<span style="display:inline-block;background:#e7e2ce;color:#112250;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;margin:2px 2px 4px">${esc(text)}</span>`;
+
+  const section = (title: string, content: string) =>
+    content.trim()
+      ? `<div style="margin-bottom:28px;page-break-inside:avoid">
+          <h2 style="font-size:14px;font-weight:800;color:#112250;border-bottom:2px solid #e7e2ce;padding-bottom:5px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em">${esc(title)}</h2>
+          ${content}
+        </div>`
+      : "";
+
+  // ── Field extraction (correct API field names) ──────────────────────────────
+
+  // Overview
+  const overview = typeof disease.overview === "string"
+    ? disease.overview
+    : (disease.overview as any)?.simple ?? JSON.stringify(disease.overview) ?? "";
+
+  // Causes
+  const causesHtml = (() => {
+    const c = disease.causes;
+    if (!c) return "";
+    if (typeof c === "object") {
+      return Object.entries(c as Record<string, string>)
+        .filter(([, v]) => v)
+        .map(([k, v]) => `<p style="margin:0 0 8px"><strong style="text-transform:capitalize;color:#112250">${esc(k)}:</strong> ${esc(v)}</p>`)
+        .join("");
+    }
+    return `<p style="margin:0;color:#3b507d">${esc(String(c))}</p>`;
+  })();
+
+  // Symptoms — correct field: typesAndSymptoms
+  const symptomsHtml = Array.isArray(disease.typesAndSymptoms) && disease.typesAndSymptoms.length
+    ? `<div style="margin-top:4px">${disease.typesAndSymptoms.map(pill).join("")}</div>`
+    : "";
+
+  // Diagnosis — correct field: diagnosis (DiagnosticStep[])
+  const diagnosisHtml = Array.isArray(disease.diagnosis) && disease.diagnosis.length
+    ? disease.diagnosis.map(s =>
+      `<div style="margin-bottom:12px;padding:10px 12px;background:#f8fafd;border-left:3px solid #112250;border-radius:4px">
+          <p style="margin:0 0 4px;font-weight:700;color:#112250">${esc(s.name)}</p>
+          ${s.what ? `<p style="margin:0 0 2px"><strong>What:</strong> ${esc(s.what)}</p>` : ""}
+          ${s.how ? `<p style="margin:0 0 2px"><strong>How:</strong> ${esc(s.how)}</p>` : ""}
+          ${s.result ? `<p style="margin:0"><strong>Result:</strong> ${esc(s.result)}</p>` : ""}
+        </div>`
+    ).join("")
+    : "";
+
+  // Lifestyle — correct field: lifestyleAndDailySupport (LifestyleData)
+  const lifestyleHtml = (() => {
+    const ls = disease.lifestyleAndDailySupport;
+    if (!ls) return "";
+    const parts: string[] = [];
+    if (ls.nutrition) parts.push(`<p style="margin:0 0 6px"><strong>Nutrition:</strong> ${esc(ls.nutrition)}</p>`);
+    if (Array.isArray(ls.therapies) && ls.therapies.length)
+      parts.push(`<p style="margin:0 0 4px"><strong>Therapies:</strong></p><div>${ls.therapies.map(t => pill(String(t))).join("")}</div>`);
+    if (Array.isArray(ls.devices) && ls.devices.length)
+      parts.push(`<p style="margin:6px 0 4px"><strong>Devices / Aids:</strong></p><div>${ls.devices.map(d => pill(String(d))).join("")}</div>`);
+    if (Array.isArray(ls.caregiverTips) && ls.caregiverTips.length)
+      parts.push(`<p style="margin:6px 0 4px"><strong>Caregiver Tips:</strong></p><ul style="margin:0;padding-left:18px;color:#3b507d">${ls.caregiverTips.map(t => `<li>${esc(String(t))}</li>`).join("")}</ul>`);
+    if (ls.community) parts.push(`<p style="margin:6px 0 0"><strong>Community:</strong> ${esc(ls.community)}</p>`);
+    return parts.join("");
+  })();
+
+  // Treatments & Research — correct field: treatmentsAndPharma (ResearchOrg[])
+  const treatmentsHtml = Array.isArray(disease.treatmentsAndPharma) && disease.treatmentsAndPharma.length
+    ? disease.treatmentsAndPharma.map(org =>
+      `<div style="margin-bottom:10px;padding:8px 12px;background:#f8fafd;border-left:3px solid #e7e2ce;border-radius:4px">
+          <p style="margin:0 0 2px;font-weight:700;color:#112250">${esc(org.name)}</p>
+          ${org.focus ? `<p style="margin:0 0 2px;color:#3b507d">${esc(org.focus)}</p>` : ""}
+          ${org.url ? `<p style="margin:0;font-size:11px"><a href="${esc(org.url)}" style="color:#3b507d">${esc(org.url)}</a></p>` : ""}
+        </div>`
+    ).join("")
+    : "";
+
+  // FAQs — correct fields: question / answer (not f.q / f.a)
+  const faqsHtml = Array.isArray(disease.faqs) && disease.faqs.length
+    ? disease.faqs.map(f =>
+      `<div style="margin-bottom:12px">
+          <p style="margin:0 0 3px;font-weight:700;color:#112250">Q: ${esc(f.question)}</p>
+          <p style="margin:0;color:#3b507d">A: ${esc(f.answer)}</p>
+        </div>`
+    ).join("")
+    : "";
+
+  // Facts & Myths — correct fields: statement / isFact / explanation (not m.myth / m.fact)
+  const mythsHtml = Array.isArray(disease.factsMyths) && disease.factsMyths.length
+    ? disease.factsMyths.map(m =>
+      `<div style="margin-bottom:10px;padding:10px;background:#f8fafd;border-left:3px solid ${m.isFact ? "#27ae60" : "#112250"};border-radius:4px">
+          <p style="margin:0 0 4px;font-weight:700;color:${m.isFact ? "#27ae60" : "#c0392b"}">${m.isFact ? "✓ Fact" : "✗ Myth"}: ${esc(m.statement)}</p>
+          <p style="margin:0;color:#3b507d">${esc(m.explanation)}</p>
+        </div>`
+    ).join("")
+    : "";
+
+  // Specialists
+  const specialistsHtml = Array.isArray(disease.specialists) && disease.specialists.length
+    ? `<table style="width:100%;border-collapse:collapse">${disease.specialists.map(s =>
+      `<tr style="border-bottom:1px solid #e7e2ce">
+            <td style="padding:8px 12px 8px 0;vertical-align:top;width:200px">
+              <p style="margin:0;font-weight:700;color:#112250">${esc(s.name)}</p>
+              ${s.profession ? `<p style="margin:2px 0 0;font-size:11px;color:#3b507d">${esc(s.profession)}</p>` : ""}
+              ${s.specialization ? `<p style="margin:2px 0 0;font-size:11px;color:#3b507d">${esc(s.specialization)}</p>` : ""}
+            </td>
+            <td style="padding:8px 0;vertical-align:top;color:#3b507d;font-size:12px">
+              ${s.organization ? `<p style="margin:0 0 2px">${esc(s.organization)}</p>` : ""}
+              ${s.location ? `<p style="margin:0 0 2px">📍 ${esc(s.location)}</p>` : ""}
+              ${s.contact ? `<p style="margin:0 0 2px">📞 ${esc(s.contact)}</p>` : ""}
+              ${s.publications ? `<p style="margin:0;font-size:11px;color:#beb7a7">${esc(s.publications)}</p>` : ""}
+            </td>
+          </tr>`
+    ).join("")
+    }</table>`
+    : "";
+
+  // Sources
+  const sourcesHtml = Array.isArray(disease.sources) && disease.sources.length
+    ? `<ul style="padding-left:18px;color:#3b507d;margin:0">${disease.sources.map(s =>
+      `<li style="margin-bottom:6px">
+            ${s.url
+        ? `<a href="${esc(s.url)}" style="color:#112250;font-weight:600">${esc(s.title)}</a>`
+        : `<span style="font-weight:600;color:#112250">${esc(s.title)}</span>`
+      }
+            ${s.type ? ` <span style="color:#beb7a7;font-size:11px">[${esc(s.type)}]</span>` : ""}
+            ${s.description ? `<br/><span style="font-size:11px">${esc(s.description)}</span>` : ""}
+          </li>`
+    ).join("")
+    }</ul>`
+    : "";
+
+  // ── Assemble HTML ───────────────────────────────────────────────────────────
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>${esc(disease.name)} – RareBridge</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;color:#222;background:#fff;font-size:13px;line-height:1.6}
+    @media print{@page{margin:16mm 14mm;size:A4}.no-print{display:none!important}}
+    .page{max-width:780px;margin:0 auto;padding:28px 20px}
+    .header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #112250;padding-bottom:14px;margin-bottom:22px}
+    .header img{height:52px;object-fit:contain}
+    .header-meta{text-align:right;color:#3b507d;font-size:11px}
+    .disease-title{font-size:24px;font-weight:900;color:#112250;margin-bottom:3px}
+    .disease-sub{font-size:12px;color:#3b507d;margin-bottom:18px}
+    table{border-collapse:collapse;width:100%}
+    .footer-bar{margin-top:36px;border-top:2px solid #e7e2ce;padding-top:8px;font-size:11px;color:#beb7a7;display:flex;justify-content:space-between}
+    p{margin-bottom:6px;color:#3b507d}
+    strong{color:#112250}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <img src="${logo}" alt="RareBridge"/>
+    <div class="header-meta">
+      <div style="font-weight:700;color:#112250;font-size:13px">RareBridge Disease Profile</div>
+      <div>Downloaded ${today}</div>
+      <div style="color:#beb7a7;font-size:10px;margin-top:2px">For informational purposes only. Not medical advice.</div>
+    </div>
+  </div>
+
+  <div class="disease-title">${esc(disease.name)}</div>
+  <div class="disease-sub">${esc(disease.category ?? "Rare Disease")}</div>
+
+  ${section("Overview", `<p style="color:#3b507d;margin:0">${esc(overview)}</p>`)}
+
+  ${section("Causes", causesHtml)}
+
+  ${section("Symptoms & Types", symptomsHtml)}
+
+  ${section("Diagnosis", diagnosisHtml)}
+
+  ${section("Lifestyle & Daily Support", lifestyleHtml)}
+
+  ${section("Treatments & Research", treatmentsHtml)}
+
+  ${section("Frequently Asked Questions", faqsHtml)}
+
+  ${section("Facts & Myths", mythsHtml)}
+
+  ${section("Specialists", specialistsHtml)}
+
+  ${section("Sources", sourcesHtml)}
+
+  <div class="footer-bar">
+    <span>© ${new Date().getFullYear()} RareBridge — rarebridge.org</span>
+    <span>Connecting families, researchers &amp; specialists</span>
+  </div>
+</div>
+</body>
+</html>`;
+
+  const win = window.open("", "_blank", "width=960,height=750");
+  if (!win) {
+    alert("Please allow popups for this site to download the PDF.");
+    return;
+  }
+  win.document.write(html);
+  win.document.close();
+  win.onload = () => { win.focus(); win.print(); };
+}
 
 export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; onBack: () => void }) {
   const [disease, setDisease] = useState<Disease | null>(null);
@@ -583,7 +820,16 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
                 Active Research
               </span>
             </div>
-            <h1 className="font-black text-2xl md:text-3xl text-ivory mb-2">{disease.name}</h1>
+            <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
+              <h1 className="font-black text-2xl md:text-3xl text-ivory">{disease.name}</h1>
+              <button
+                onClick={() => downloadDiseaseAsPDF(disease)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-ivory text-sm font-bold transition-all duration-200 border border-white/20 shrink-0"
+              >
+                <Download className="w-4 h-4" />
+                Download PDF
+              </button>
+            </div>
             <p className="text-taupe text-sm max-w-2xl">{shortDesc}</p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
@@ -606,11 +852,10 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
             <button
               key={s}
               onClick={() => setActiveSection(i)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
-                activeSection === i
-                  ? "bg-primary text-ivory shadow-md"
-                  : "bg-white text-accent border border-taupe-40 hover:border-accent/40 hover:text-primary"
-              }`}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${activeSection === i
+                ? "bg-primary text-ivory shadow-md"
+                : "bg-white text-accent border border-taupe-40 hover:border-accent/40 hover:text-primary"
+                }`}
             >
               {s}
             </button>
@@ -750,11 +995,10 @@ export default function DiseasePage({ diseaseId, onBack }: { diseaseId: string; 
                     </div>
                   )}
                   <div
-                    className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                      msg.role === "user"
-                        ? "bg-primary text-secondary rounded-br-sm"
-                        : "bg-white text-accent rounded-bl-sm shadow-sm border border-secondary"
-                    }`}
+                    className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === "user"
+                      ? "bg-primary text-secondary rounded-br-sm"
+                      : "bg-white text-accent rounded-bl-sm shadow-sm border border-secondary"
+                      }`}
                   >
                     {msg.text}
                   </div>

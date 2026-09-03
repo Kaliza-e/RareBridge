@@ -39,9 +39,13 @@ export interface FactMyth {
 
 export interface Specialist {
   name: string;
+  profession?: string;
+  specialization?: string;
   organization: string;
   location: string;
   contact?: string | null;
+  publications?: string;
+  /** Legacy compat */
   focus: string;
   why: string;
 }

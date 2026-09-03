@@ -11,7 +11,7 @@ export default function DirectoryPage({ onDisease }: { onDisease: (id: string) =
   const [diseases, setDiseases] = useState(DISEASES);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   useEffect(() => {
     async function loadDiseases() {
